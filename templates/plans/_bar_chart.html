@@ -1,0 +1,18 @@
+{# Expects: chart (from plans.charts.bar_chart), title_id #}
+<figure class="relative" data-chart>
+  <svg viewBox="0 0 {{ chart.width }} {{ chart.height }}" class="h-auto w-full overflow-visible" role="img" aria-labelledby="{{ title_id }}">
+    {% for g in chart.grid %}
+      <line x1="{{ chart.left }}" x2="{{ chart.right }}" y1="{{ g.y|floatformat:1 }}" y2="{{ g.y|floatformat:1 }}" stroke="#F1E9DC" stroke-width="1"/>
+      <text x="{{ chart.tick_x }}" y="{{ g.y|floatformat:1 }}" dy="4" text-anchor="end" font-size="11" fill="#52606D">{{ g.label }}</text>
+    {% endfor %}
+    {% for b in chart.bars %}
+      <g>
+        <path d="{{ b.path }}" fill="#C2410C"{% if not b.is_latest %} fill-opacity="0.75"{% endif %}/>
+        {% if b.show_value %}<text x="{{ b.cx|floatformat:1 }}" y="{{ b.cap_y|floatformat:1 }}" text-anchor="middle" font-size="11" font-weight="600" fill="#1F2933">{{ b.value }}</text>{% endif %}
+        {% if b.x_label %}<text x="{{ b.cx|floatformat:1 }}" y="{{ chart.x_label_y }}" text-anchor="middle" font-size="11" fill="#52606D">{{ b.x_label }}</text>{% endif %}
+        <rect x="{{ b.hit_x|floatformat:1 }}" y="{{ chart.plot_top }}" width="{{ b.hit_w|floatformat:1 }}" height="{{ chart.plot_h }}" fill="transparent" tabindex="0" focusable="true" data-tip="{{ b.tooltip }}" aria-label="{{ b.tooltip }}"><title>{{ b.tooltip }}</title></rect>
+      </g>
+    {% endfor %}
+  </svg>
+  <div class="pointer-events-none absolute z-10 hidden rounded-lg bg-ink px-3 py-2 text-sm text-white shadow" role="tooltip" data-chart-tip></div>
+</figure>

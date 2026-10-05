@@ -1,11 +1,14 @@
+from django.conf import settings
 from django.contrib import messages as flash
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_POST
 
-from . import engine, onboarding, services
-from .models import Block, DayLog, Journey
+from . import charts, engine, fuel, ics, learn, onboarding, services
+from .models import Block, DayLog, Journey, Milestone
 
 
 def wants_json(request) -> bool:
@@ -82,15 +85,21 @@ def _get_or_create_journey(request) -> Journey | None:
 def _day_cards(block: Block) -> list[dict]:
     cards = []
     for day in block.days.all():
-        card = {"day": day}
+        card = {"day": day, "lesson": learn.lesson_for(day.kind, block.level)}
         if day.kind == "run":
             card.update(
                 level=block.level_info,
                 steps=engine.session_steps(block.level),
                 total_minutes=engine.session_total_minutes(block.level),
+                fuel=fuel.fuel_tip(block.index),
             )
         cards.append(card)
     return cards
+
+
+def _milestone_url(journey: Journey) -> str | None:
+    unseen = services.next_unseen_milestone(journey)
+    return reverse("plans:milestone", args=[unseen.key]) if unseen else None
 
 
 @login_required
@@ -98,16 +107,29 @@ def today(request):
     journey = _get_or_create_journey(request)
     if journey is None:
         return redirect("plans:start")
-    block = services.current_block(journey)
+    skip_wait = settings.DEBUG and request.GET.get("skip_wait") == "1"
+    result = services.refresh(journey, skip_wait=skip_wait)
+    if result.message:
+        flash.info(request, result.message)
+    block = result.block
     if block is None:
-        return redirect("core:landing")
-    return render(request, "plans/today.html", {
+        return redirect("plans:finished" if journey.is_complete else "core:landing")
+
+    context = {
         "journey": journey,
         "current": block,
-        "cards": _day_cards(block),
-        "rest_text": engine.REST_DAY_TEXT,
         "total_blocks": engine.estimated_total_blocks(block.index, block.level),
         "hint": engine.coming_up_hint(block.level),
+        "milestone_url": _milestone_url(journey),
+    }
+    if block.status == Block.Status.LOCKED:
+        context["unlocks_at"] = block.unlocks_at
+        return render(request, "plans/waiting.html", context)
+    return render(request, "plans/today.html", {
+        **context,
+        "cards": _day_cards(block),
+        "rest_text": engine.REST_DAY_TEXT,
+        "feedback_choices": [c for c in engine.FEEDBACK_CHOICES if c[0] != engine.DIDNT_DO],
     })
 
 
@@ -119,13 +141,118 @@ def complete_day(request, day_id):
         pk=day_id, block__journey__user=request.user, block__status=Block.Status.ACTIVE,
     )
     result = services.complete_day(day)
+    milestone_url = _milestone_url(day.block.journey)
     if wants_json(request):
         return JsonResponse({
             "ok": True,
             "message": result.message,
             "already_done": result.already_done,
             "block_done": result.block_done,
+            "milestone_url": milestone_url,
         })
     if not result.already_done:
         flash.success(request, result.message)
     return redirect("plans:today")
+
+
+# --- Feedback ---------------------------------------------------------------------------
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def block_feedback(request, block_id):
+    block = get_object_or_404(Block, pk=block_id, journey__user=request.user)
+    if block.status != Block.Status.ACTIVE:
+        return redirect("plans:today")
+    if request.method == "GET":
+        return render(request, "plans/feedback.html", {
+            "current": block,
+            "feedback_choices": [c for c in engine.FEEDBACK_CHOICES if c[0] != engine.DIDNT_DO],
+        })
+
+    feedback = request.POST.get("feedback", "")
+    if feedback not in {v for v, _ in engine.FEEDBACK_CHOICES}:
+        return redirect("plans:block_feedback", block_id=block.pk)
+    result = services.submit_feedback(block, feedback)
+    journey = block.journey
+    journey.refresh_from_db()
+    if result.journey_complete:
+        target = reverse("plans:finished")
+    else:
+        target = _milestone_url(journey) or reverse("plans:today")
+    if wants_json(request):
+        return JsonResponse({"ok": True, "message": result.message, "redirect": target})
+    if result.message:
+        flash.success(request, result.message)
+    return redirect(target)
+
+
+# --- Milestones, finish, calendar, progress -----------------------------------------------
+
+@login_required
+def milestone(request, key):
+    if key not in engine.MILESTONES:
+        raise Http404
+    m = get_object_or_404(Milestone, journey__user=request.user, key=key)
+    if m.seen_at is None:
+        Milestone.objects.filter(pk=m.pk).update(seen_at=timezone.now())
+    from . import messages as msgs
+    journey = m.journey
+    return render(request, "plans/milestone.html", {
+        "milestone": m,
+        "info": m.info,
+        "message": msgs.pick(f"milestone_{key}").text,
+        "next_url": _milestone_url(journey) or reverse("plans:finished" if journey.is_complete else "plans:today"),
+    })
+
+
+@login_required
+def finished(request):
+    journey = get_object_or_404(Journey, user=request.user)
+    if not journey.is_complete:
+        return redirect("plans:today")
+    unseen = services.next_unseen_milestone(journey)
+    if unseen:
+        return redirect("plans:milestone", key=unseen.key)
+    return render(request, "plans/finished.html", {"journey": journey, "stats": services.progress_stats(journey)})
+
+
+@login_required
+def next_block_ics(request):
+    journey = get_object_or_404(Journey, user=request.user)
+    block = services.current_block(journey)
+    if block is None or block.status != Block.Status.LOCKED:
+        raise Http404
+    level = block.level_info
+    body = ics.event(
+        uid=f"block-{block.pk}@first5k",
+        start=block.unlocks_at,
+        summary="First5K: your next 2 days are ready 👟",
+        description=(f"Next up: {level['title']}. {engine.session_summary(block.level)}. "
+                     f"Open your plan: {settings.SITE_URL}{reverse('plans:today')}"),
+        url=f"{settings.SITE_URL}{reverse('plans:today')}",
+    )
+    resp = HttpResponse(body, content_type="text/calendar; charset=utf-8")
+    resp["Content-Disposition"] = 'attachment; filename="first5k-next-block.ics"'
+    return resp
+
+
+@login_required
+def progress(request):
+    journey = Journey.objects.filter(user=request.user).first()
+    if journey is None:
+        return redirect("plans:start")
+    stats = services.progress_stats(journey)
+    points = []
+    for r in stats["runs"]:
+        day = timezone.localtime(r["date"])
+        minutes = r["jog_minutes"]
+        points.append({
+            "label": str(r["number"]),
+            "value": minutes,
+            "tooltip": f"Run {r['number']} · {day:%-d %b}: {minutes} min jogging",
+        })
+    block = services.current_block(journey)
+    return render(request, "plans/progress.html", {
+        "journey": journey, "stats": stats, "chart": charts.bar_chart(points),
+        "level_is_next": block is not None and block.status == Block.Status.LOCKED,
+    })

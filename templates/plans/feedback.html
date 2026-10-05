@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}How did it feel? · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="pt-4">
+  <p class="eyebrow">Block {{ current.index }}</p>
+  <p class="mt-2 text-muted">Wrapping this block up early is completely fine. We'll adapt.</p>
+</div>
+<div class="card mt-6">{% include "plans/_feedback_form.html" %}</div>
+<p class="mt-6 text-center text-base"><a href="{% url 'plans:today' %}" class="text-muted">← Back to my 2 days</a></p>
+{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'js/feedback.js' %}"></script>{% endblock %}

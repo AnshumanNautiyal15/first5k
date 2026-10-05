@@ -5,11 +5,11 @@ export function csrfTokenFrom(form) {
   return input ? input.value : "";
 }
 
-export async function postForm(form) {
+export async function postForm(form, body = new FormData(form)) {
   const response = await fetch(form.action, {
     method: "POST",
     headers: { Accept: "application/json", "X-CSRFToken": csrfTokenFrom(form) },
-    body: new FormData(form),
+    body,
     credentials: "same-origin",
   });
   if (!response.ok) throw new Error(`Request failed: ${response.status}`);

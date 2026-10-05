@@ -287,13 +287,13 @@ MILESTONE_FIVE_MINUTES = "five_minutes"
 MILESTONE_HALFWAY = "halfway"
 MILESTONE_FIVE_K = "five_k"
 
-MILESTONES: dict[str, dict] = {
+MILESTONES: dict[str, dict] = {  # in the order they're usually reached
     MILESTONE_FIRST_BLOCK: {"title": "First block done!", "emoji": "🌱",
                             "share_text": "I just finished my first running block!"},
-    MILESTONE_FIVE_MINUTES: {"title": "5 minutes without stopping!", "emoji": "🔥",
-                             "share_text": "I just jogged 5 minutes without stopping!"},
     MILESTONE_HALFWAY: {"title": "Halfway there!", "emoji": "⛰️",
                         "share_text": "I'm halfway to my first 5K!"},
+    MILESTONE_FIVE_MINUTES: {"title": "5 minutes without stopping!", "emoji": "🔥",
+                             "share_text": "I just jogged 5 minutes without stopping!"},
     MILESTONE_FIVE_K: {"title": "You ran your first 5K!", "emoji": "🏅",
                        "share_text": "I just finished my first 5K!"},
 }
@@ -338,3 +338,11 @@ def coming_up_hint(level: int) -> str | None:
             unit = "minute" if minutes == 1 else "minutes"
             return f"Soon you'll be jogging {minutes} {unit} straight."
     return None
+
+
+def total_jog_minutes(level: int) -> int:
+    """Minutes spent jogging in one run session (the 5K counts as its continuous_minutes)."""
+    lvl = get_level(level)
+    if lvl["kind"] == "5k":
+        return lvl["continuous_minutes"]
+    return round(lvl["jog_seconds"] * lvl["repeats"] / 60)

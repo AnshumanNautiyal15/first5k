@@ -1,0 +1,8 @@
+{# Expects: lesson, done (bool) #}
+<details class="mt-4 rounded-xl bg-leaf-soft px-4 py-3 text-base">
+  <summary class="flex min-h-tap cursor-pointer items-center gap-2 font-semibold">
+    <span aria-hidden="true">📖</span> {% if done %}What today did for you{% else %}What today does for you{% endif %}
+  </summary>
+  <p class="mt-2">{{ lesson.benefit }}</p>
+  <p class="mt-3"><span class="font-semibold">Running word: {{ lesson.term }}.</span> {{ lesson.meaning }}</p>
+</details>

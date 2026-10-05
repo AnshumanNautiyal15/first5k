@@ -1,0 +1,19 @@
+{# Expects: current, feedback_choices #}
+<form method="post" action="{% url 'plans:block_feedback' current.id %}" data-feedback-form>
+  {% csrf_token %}
+  <fieldset>
+    <legend class="text-2xl font-bold">How did it feel?</legend>
+    <p class="mt-1 text-muted">One tap. We'll shape your next 2 days around it.</p>
+    <div class="mt-4 grid gap-3">
+      {% for value, label in feedback_choices %}
+        <button type="submit" name="feedback" value="{{ value }}" class="option justify-between">
+          <span>{{ label }}</span>
+          <span aria-hidden="true" class="text-2xl">{% if value == "too_easy" %}😎{% elif value == "just_right" %}🙂{% else %}😮‍💨{% endif %}</span>
+        </button>
+      {% endfor %}
+    </div>
+  </fieldset>
+  <p class="mt-4 text-center text-base">
+    <button type="submit" name="feedback" value="didnt_do" class="min-h-tap px-2 text-muted underline">I couldn't do these days</button>
+  </p>
+</form>

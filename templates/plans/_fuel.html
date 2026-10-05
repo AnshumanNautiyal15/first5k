@@ -1,0 +1,9 @@
+{# Expects: fuel #}
+<details class="mt-3 rounded-xl bg-sand/60 px-4 py-3 text-base">
+  <summary class="flex min-h-tap cursor-pointer items-center gap-2 font-semibold">
+    <span aria-hidden="true">🍌</span> Fuel ideas (optional)
+  </summary>
+  <p class="mt-2"><span class="font-semibold">If you're hungry, 30–60 min before:</span> {{ fuel.before.0 }}, or {{ fuel.before.1|lower }}.</p>
+  <p class="mt-2"><span class="font-semibold">Afterwards:</span> {{ fuel.after }}.</p>
+  <p class="mt-2 text-muted">{{ fuel.note }}</p>
+</details>

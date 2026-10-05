@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Your progress · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="pt-4">
+  <p class="eyebrow">Your journey so far</p>
+  <h1 class="mt-2">Look how far you've come</h1>
+  <p class="mt-2 text-muted">{% if level_is_next %}Up next: {% endif %}Level {{ stats.level.number }} of 12, {{ stats.level.title|lower }}</p>
+</section>
+
+<dl class="mt-6 grid grid-cols-2 gap-3">
+  <div class="card"><dt class="text-base text-muted">Runs done</dt><dd class="text-4xl font-bold">{{ stats.run_count }}</dd></div>
+  <div class="card"><dt class="text-base text-muted">Minutes jogged</dt><dd class="text-4xl font-bold">{{ stats.total_jog_minutes }}</dd></div>
+  <div class="card"><dt class="text-base text-muted">Longest jog</dt><dd class="text-4xl font-bold">{{ stats.longest_jog }}<span class="text-lg font-semibold"> min</span></dd></div>
+  <div class="card"><dt class="text-base text-muted">Rest days taken</dt><dd class="text-4xl font-bold">{{ stats.rest_days }}</dd></div>
+</dl>
+
+<section class="card mt-6" aria-labelledby="chart-title">
+  <h2 id="chart-title" class="text-xl">Minutes of jogging, run by run</h2>
+  {% if chart %}
+    <p class="mt-1 text-base text-muted">Each bar is one run. Taller means more time jogging.</p>
+    <div class="mt-4">{% include "plans/_bar_chart.html" with title_id="chart-title" %}</div>
+    <details class="mt-3 text-base">
+      <summary class="min-h-tap cursor-pointer py-2 text-muted">Show as a table</summary>
+      <table class="mt-2 w-full text-left">
+        <thead><tr class="text-muted"><th class="py-1 font-semibold">Run</th><th class="py-1 font-semibold">Date</th><th class="py-1 text-right font-semibold">Jogging</th></tr></thead>
+        <tbody>
+          {% for r in stats.runs %}<tr class="border-t border-sand"><td class="py-1">{{ r.number }}</td><td class="py-1">{{ r.date|date:"j M" }}</td><td class="py-1 text-right">{{ r.jog_minutes }} min</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </details>
+  {% else %}
+    <p class="mt-3 text-muted">Your chart starts with your first run. It's going to look great.</p>
+  {% endif %}
+</section>
+
+<section class="mt-6" aria-labelledby="badges-title">
+  <h2 id="badges-title" class="text-xl">Milestones</h2>
+  <ul class="mt-3 grid grid-cols-2 gap-3">
+    {% for m in stats.milestones %}
+      <li class="card text-center {% if not m.achieved_at %}opacity-60{% endif %}">
+        {% if m.achieved_at %}
+          <a href="{% url 'plans:milestone' m.key %}" class="no-underline">
+            <span class="block text-4xl" aria-hidden="true">{{ m.emoji }}</span>
+            <span class="mt-1 block font-semibold">{{ m.title }}</span>
+            <span class="block text-sm text-muted">{{ m.achieved_at|date:"j M" }}</span>
+          </a>
+        {% else %}
+          <span class="block text-4xl grayscale" aria-hidden="true">{{ m.emoji }}</span>
+          <span class="mt-1 block font-semibold">{{ m.title }}</span>
+          <span class="block text-sm text-muted">{% if m.key == stats.next_milestone.key %}Next up{% else %}Still to come{% endif %}</span>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<div class="mt-8"><a href="{% url 'plans:today' %}" class="btn-primary">Back to my 2 days</a></div>
+{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'js/chart-tooltip.js' %}"></script>{% endblock %}

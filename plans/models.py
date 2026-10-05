@@ -88,3 +88,21 @@ class DayLog(models.Model):
 
     def __str__(self):
         return f"{self.block} day {self.day_number} ({self.kind})"
+
+
+class Milestone(models.Model):
+    journey = models.ForeignKey(Journey, on_delete=models.CASCADE, related_name="milestones")
+    key = models.CharField(max_length=32, choices=[(k, v["title"]) for k, v in engine.MILESTONES.items()])
+    achieved_at = models.DateTimeField(default=timezone.now)
+    seen_at = models.DateTimeField(null=True, blank=True)  # celebration screen shown
+
+    class Meta:
+        ordering = ["achieved_at"]
+        constraints = [models.UniqueConstraint(fields=["journey", "key"], name="unique_milestone")]
+
+    def __str__(self):
+        return f"{self.journey.user}: {self.key}"
+
+    @property
+    def info(self):
+        return engine.MILESTONES[self.key]

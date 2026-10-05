@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}You did it! · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="pt-8 text-center">
+  {% include "plans/_milestone_art.html" with key="five_k" label="A gold 5K medal" %}
+  <h1 class="mt-6 text-4xl">You're a 5K runner.</h1>
+  <p class="mt-4 text-xl">From your first slow minute to {{ stats.longest_jog }} minutes of running. {{ stats.run_count }} runs, {{ stats.total_jog_minutes }} minutes of jogging. All you.</p>
+</section>
+
+<section class="mt-10" aria-labelledby="next-heading">
+  <h2 id="next-heading">What's next?</h2>
+  <ul class="mt-4 space-y-3">
+    <li class="card"><h3 class="text-xl font-bold"><span aria-hidden="true">🔁</span> Keep running</h3><p class="text-muted">Two or three easy runs a week keeps everything you've built. Same rules: slow is fine.</p></li>
+    <li class="card"><h3 class="text-xl font-bold"><span aria-hidden="true">🌳</span> Try a parkrun</h3><p class="text-muted">Free, weekly, timed 5K events in parks around the world. Walkers welcome, very friendly.</p></li>
+    <li class="card"><h3 class="text-xl font-bold"><span aria-hidden="true">🎯</span> Dream about a 10K</h3><p class="text-muted">Same idea, just a little more time on your feet. No rush at all.</p></li>
+  </ul>
+</section>
+<div class="mt-8"><a href="{% url 'plans:progress' %}" class="btn-secondary">See my whole journey</a></div>
+{% endblock %}
+{% block scripts %}
+<script type="module">
+  import { confetti } from "{% static 'js/confetti.js' %}";
+  confetti({ pieces: 180, duration: 3600 });
+</script>
+{% endblock %}

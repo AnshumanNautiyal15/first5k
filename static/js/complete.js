@@ -31,9 +31,17 @@ document.querySelectorAll("[data-complete-form]").forEach((form) => {
       renderDone(status, data.message);
       if (live) live.textContent = data.message;
       if (!data.already_done) confetti();
+      if (data.milestone_url) {
+        const wrap = document.querySelector("[data-milestone-link]");
+        if (wrap) {
+          wrap.querySelector("a").href = data.milestone_url;
+          wrap.hidden = false;
+        }
+      }
       if (data.block_done) {
         const done = document.querySelector("[data-block-done]");
         if (done) done.hidden = false;
+        document.querySelector("[data-done-early]")?.remove();
       }
     } catch (err) {
       // Fall back to a normal form post so the action still works.

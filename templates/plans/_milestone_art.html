@@ -1,0 +1,26 @@
+{# Expects: key. Large, simple inline illustrations in brand colours. #}
+<svg class="mx-auto h-40 w-40" viewBox="0 0 160 160" role="img" aria-label="{{ label }}">
+  <circle cx="80" cy="80" r="76" fill="#FFEDD5"/>
+  {% if key == "first_block" %}
+    <path d="M80 128V78" stroke="#2F7A5B" stroke-width="6" stroke-linecap="round"/>
+    <path d="M80 92c-22 0-34-14-34-34 22 0 34 14 34 34z" fill="#2F7A5B"/>
+    <path d="M80 80c0-24 14-38 38-38 0 24-14 38-38 38z" fill="#3E9A73"/>
+    <rect x="52" y="122" width="56" height="12" rx="6" fill="#C2410C"/>
+  {% elif key == "five_minutes" %}
+    <circle cx="80" cy="86" r="42" fill="#fff" stroke="#C2410C" stroke-width="7"/>
+    <rect x="72" y="32" width="16" height="12" rx="3" fill="#C2410C"/>
+    <path d="M80 86V60" stroke="#1F2933" stroke-width="6" stroke-linecap="round"/>
+    <path d="M80 86L100 98" stroke="#1F2933" stroke-width="6" stroke-linecap="round"/>
+    <text x="80" y="118" text-anchor="middle" font-size="16" font-weight="700" fill="#9A3412">5 MIN</text>
+  {% elif key == "halfway" %}
+    <path d="M18 124L64 56l22 30 16-20 40 58z" fill="#2F7A5B"/>
+    <path d="M64 56l10 15-10-4-8 6z" fill="#fff"/>
+    <path d="M102 66V30" stroke="#1F2933" stroke-width="4" stroke-linecap="round"/>
+    <path d="M102 30h26l-8 8 8 8h-26z" fill="#C2410C"/>
+  {% else %}
+    <path d="M58 20l22 40 22-40h-14l-8 16-8-16z" fill="#2F7A5B"/>
+    <circle cx="80" cy="96" r="38" fill="#F59E0B"/>
+    <circle cx="80" cy="96" r="28" fill="#FBBF24"/>
+    <text x="80" y="104" text-anchor="middle" font-size="24" font-weight="800" fill="#7C2D12">5K</text>
+  {% endif %}
+</svg>

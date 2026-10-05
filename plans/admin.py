@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Block, DayLog, Journey, OnboardingStart
+from . import services
+from .models import Block, DayLog, Journey, Milestone, OnboardingStart
 
 
 @admin.register(OnboardingStart)
@@ -36,3 +37,18 @@ class BlockAdmin(admin.ModelAdmin):
     list_filter = ("status", "feedback", "level", "entry_note")
     search_fields = ("journey__user__email",)
     inlines = [DayLogInline]
+    actions = ["unlock_now"]
+
+    @admin.action(description="Unlock now (skip the wait, for testing)")
+    def unlock_now(self, request, queryset):
+        locked = queryset.filter(status=Block.Status.LOCKED)
+        for block in locked:
+            services.unlock_now(block)
+        self.message_user(request, f"{locked.count()} block(s) will unlock on the user's next visit.")
+
+
+@admin.register(Milestone)
+class MilestoneAdmin(admin.ModelAdmin):
+    list_display = ("journey", "key", "achieved_at", "seen_at")
+    list_filter = ("key", "achieved_at")
+    search_fields = ("journey__user__email",)

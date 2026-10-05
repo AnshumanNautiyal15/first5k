@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ info.title }} · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="pt-8 text-center" aria-labelledby="milestone-title">
+  {% include "plans/_milestone_art.html" with key=milestone.key label=info.title %}
+  <p class="eyebrow mt-6">Milestone unlocked</p>
+  <h1 id="milestone-title" class="mt-2 text-4xl">{{ info.title }}</h1>
+  <p class="mt-4 text-xl">{{ message }}</p>
+  <p class="mt-2 text-base text-muted">{{ milestone.achieved_at|date:"j F Y" }}</p>
+</section>
+{# Share card slot: added in Phase 4. #}
+<div class="mt-8 space-y-3">
+  <a href="{{ next_url }}" class="btn-primary">Keep going</a>
+  <a href="{% url 'plans:progress' %}" class="btn-secondary">See my progress</a>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="module">
+  import { confetti } from "{% static 'js/confetti.js' %}";
+  confetti({ pieces: 160, duration: 3200 });
+</script>
+{% endblock %}

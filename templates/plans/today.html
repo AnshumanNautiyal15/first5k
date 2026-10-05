@@ -4,7 +4,7 @@
 {% block content %}
 {% include "partials/progress.html" %}
 
-<h1 class="mt-6">Your next 2 days</h1>
+<h1 class="mt-6">{% if current.entry_note == "welcome_back" or current.entry_note == "ease_down" %}Welcome back! Your next 2 days{% else %}Your next 2 days{% endif %}</h1>
 <p class="mt-1 text-muted">Do them in any order that suits you. Slow is fine.</p>
 
 <div class="mt-6 space-y-4">
@@ -19,6 +19,9 @@
         <h3 class="text-xl font-bold">Recover and feel good</h3>
         <p class="text-muted">{{ rest_text }}</p>
       {% endif %}
+
+      {% include "plans/_lesson.html" with lesson=card.lesson done=day.completed_at %}
+      {% if card.fuel %}{% include "plans/_fuel.html" with fuel=card.fuel %}{% endif %}
 
       <div class="mt-5" data-day-status>
         {% if day.completed_at %}
@@ -38,15 +41,26 @@
   {% endfor %}
 </div>
 
-<section class="card mt-6 text-center" data-block-done {% if not current.all_days_done %}hidden{% endif %}>
-  <p class="text-4xl" aria-hidden="true">🎉</p>
-  <h2 class="mt-2">Both days done!</h2>
-  <p class="mt-2 text-muted">Brilliant work. Your next 2 days are being lined up.</p>
+<p class="mt-4 text-center" data-milestone-link {% if not milestone_url %}hidden{% endif %}>
+  <a href="{{ milestone_url|default:'#' }}" class="btn-secondary">See your milestone <span aria-hidden="true">🎉</span></a>
+</p>
+
+<section class="card mt-6" id="feedback" data-block-done {% if not current.all_days_done %}hidden{% endif %}>
+  <p class="text-center text-4xl" aria-hidden="true">🎉</p>
+  <h2 class="mt-2 text-center">Both days done!</h2>
+  <div class="mt-4">{% include "plans/_feedback_form.html" %}</div>
 </section>
+
+{% if not current.all_days_done %}
+<p class="mt-6 text-center text-base" data-done-early>
+  <a href="{% url 'plans:block_feedback' current.id %}" class="inline-flex min-h-tap items-center text-muted">I'm done with this block</a>
+</p>
+{% endif %}
 
 <p class="sr-only" aria-live="polite" data-live-region></p>
 {% endblock %}
 
 {% block scripts %}
 <script type="module" src="{% static 'js/complete.js' %}"></script>
+<script type="module" src="{% static 'js/feedback.js' %}"></script>
 {% endblock %}

@@ -22,7 +22,11 @@
     <a href="/" class="text-xl font-bold no-underline" aria-label="{{ SITE_NAME }} home"><span aria-hidden="true">👟</span> {{ SITE_NAME }}</a>
     <nav aria-label="Account" class="text-base">
       {% if user.is_authenticated %}
+        <div class="flex items-center gap-1">
+        <a href="{% url 'plans:today' %}" class="inline-flex min-h-tap items-center px-2 {% if request.resolver_match.url_name == 'today' %}font-semibold text-ink no-underline{% else %}text-muted{% endif %}">Today</a>
+        <a href="{% url 'plans:progress' %}" class="inline-flex min-h-tap items-center px-2 {% if request.resolver_match.url_name == 'progress' %}font-semibold text-ink no-underline{% else %}text-muted{% endif %}">Progress</a>
         <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit" class="min-h-tap px-2 text-muted underline">Log out</button></form>
+        </div>
       {% elif request.resolver_match.url_name != 'login' %}
         <a href="{% url 'accounts:login' %}" class="inline-flex min-h-tap items-center px-2 text-muted">Log in</a>
       {% endif %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Rest up · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+{% include "partials/progress.html" %}
+
+<div class="pt-8 text-center">
+  <svg class="mx-auto h-28 w-28" viewBox="0 0 120 120" role="img" aria-label="A crescent moon and stars">
+    <circle cx="60" cy="60" r="56" fill="#FFEDD5"/>
+    <path d="M72 30a32 32 0 1 0 18 52A28 28 0 0 1 72 30z" fill="#C2410C"/>
+    <circle cx="38" cy="38" r="3" fill="#2F7A5B"/><circle cx="30" cy="70" r="2" fill="#2F7A5B"/><circle cx="88" cy="30" r="2.5" fill="#2F7A5B"/>
+  </svg>
+  <h1 class="mt-4">Rest up</h1>
+  <p class="mt-3 text-xl">Your next 2 days unlock on<br><strong>{{ unlocks_at|date:"l, j F" }}</strong> <span class="text-muted">at {{ unlocks_at|time:"g:i a" }}</span></p>
+  <p class="mt-3 text-muted">Resting is when your body gets stronger. We'll email you when they're ready.</p>
+</div>
+
+<div class="mt-8 space-y-3">
+  <a href="{% url 'plans:next_block_ics' %}" class="btn-primary"><span aria-hidden="true">📅</span> Add to calendar</a>
+  <a href="{% url 'plans:progress' %}" class="btn-secondary">See how far you've come</a>
+  {% if milestone_url %}<a href="{{ milestone_url }}" class="btn-secondary">See your milestone <span aria-hidden="true">🎉</span></a>{% endif %}
+</div>
+<p class="mt-6 text-center text-base text-muted">Feel like moving anyway? A relaxed walk is always a lovely idea.</p>
+{% endblock %}

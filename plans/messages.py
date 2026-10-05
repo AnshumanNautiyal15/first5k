@@ -54,7 +54,7 @@ MESSAGES: dict[str, list[str]] = {
     ],
     # Milestones (bigger moments).
     "milestone_first_block": [
-        "Your first block is done! You're officially a runner-in-progress.",
+        "You're officially a runner-in-progress. Two days, done and dusted.",
         "One block down. You've already done more than most people who say 'one day'.",
     ],
     "milestone_five_minutes": [
