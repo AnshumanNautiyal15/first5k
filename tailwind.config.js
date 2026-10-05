@@ -6,7 +6,8 @@ module.exports = {
       colors: {
         // Named brand colours. All text/background pairs used meet WCAG AA.
         cream: "#FBF7F0",      // page background
-        sand: "#F1E9DC",       // subtle panels, borders
+        sand: "#F1E9DC",       // subtle panels, decorative borders
+        line: "#8F8070",       // borders of interactive controls (3.8:1 on white, WCAG 1.4.11)
         ink: "#1F2933",        // main text (15:1 on cream)
         muted: "#52606D",      // secondary text (6.2:1 on cream)
         accent: {

@@ -1,0 +1,7 @@
+{% extends "admin/index.html" %}
+{% block content %}
+<div class="module" style="margin-bottom:20px;padding:12px 16px;">
+  <strong>📈 <a href="{% url 'admin:stats' %}">Funnel stats</a></strong>: onboarding → sign-up → first block → second block → block 6+
+</div>
+{{ block.super }}
+{% endblock %}

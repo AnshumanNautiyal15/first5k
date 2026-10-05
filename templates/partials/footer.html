@@ -1,6 +1,11 @@
 <footer class="border-t border-sand bg-sand/40">
   <div class="container-narrow space-y-3 py-6 text-base text-muted">
     {% include "partials/safety_note.html" %}
+    <nav aria-label="Legal" class="flex flex-wrap gap-x-4">
+      <a href="{% url 'core:health' %}" class="inline-flex min-h-tap items-center">Health &amp; safety</a>
+      <a href="{% url 'core:privacy' %}" class="inline-flex min-h-tap items-center">Privacy</a>
+      <a href="{% url 'core:terms' %}" class="inline-flex min-h-tap items-center">Terms</a>
+    </nav>
     <p>&copy; {% now "Y" %} {{ SITE_NAME }}</p>
   </div>
 </footer>

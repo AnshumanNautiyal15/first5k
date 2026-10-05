@@ -17,7 +17,10 @@ make test             # pytest (pytest-django, settings in pytest.ini)
 make css              # build static/css/app.css with the Tailwind v3 standalone CLI in bin/ (auto-downloaded)
 make css-watch
 .venv/bin/python manage.py send_scheduled_emails   # hourly via cron in production
+.venv/bin/python manage.py seed_demo               # DEBUG only: 7 demo users at different stages + login links
 ```
+
+Deployment is described in README.md (`Procfile`, `render.yaml`). Funnel stats live at `/admin/stats/` (`core/stats.py`, registered by patching `admin.site.get_urls` in `core/admin.py`).
 
 After changing Tailwind classes in templates or JS, run `make css` and commit `static/css/app.css`; production never runs the CLI.
 
@@ -38,6 +41,6 @@ After changing Tailwind classes in templates or JS, run `make css` and commit `s
 
 ## Conventions
 
-- Copy tone: warm, encouraging, no unexplained jargon, never guilt or judgment, no streaks. Skipping or coming back late is never failure. Run days always include the talk test and "walking is always allowed"; the safety note is `templates/partials/safety_note.html`.
+- Copy tone: warm, encouraging, no unexplained jargon, never guilt or judgment, no streaks. Skipping or coming back late is never failure. Run days always include the talk test and "walking is always allowed"; the safety note is `templates/partials/safety_note.html`. The legal pages (`templates/core/privacy.html` etc.) describe exactly what data is stored, so update them when you change what is collected.
 - Frontend: server-rendered templates, vanilla JS modules in `static/js` (no frameworks, no JS build step). Every action must also work as a plain form POST without JS. Mobile-first, 48px minimum tap targets, 18px base text, `prefers-reduced-motion` respected.
-- Brand colours are named in `tailwind.config.js` (`cream`, `ink`, `muted`, `accent`, `leaf`, `sand`); use those, not raw palette colours. Shared component classes (`.card`, `.btn-primary`, `.option`, `.tip`) live in `static/src/input.css`.
+- Brand colours are named in `tailwind.config.js` (`cream`, `ink`, `muted`, `accent`, `leaf`, `sand`, `line`); use those, not raw palette colours. Borders of interactive controls use `line` (3:1 contrast); `sand` is for decoration only. Shared component classes (`.card`, `.btn-primary`, `.option`, `.tip`) live in `static/src/input.css`.

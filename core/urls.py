@@ -6,4 +6,8 @@ app_name = "core"
 
 urlpatterns = [
     path("", views.landing, name="landing"),
+    path("privacy/", views.privacy, name="privacy"),
+    path("terms/", views.terms, name="terms"),
+    path("health/", views.health, name="health"),
+    path("robots.txt", views.robots_txt, name="robots"),
 ]

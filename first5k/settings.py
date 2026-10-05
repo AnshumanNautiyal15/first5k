@@ -20,6 +20,8 @@ env = environ.Env(
     SITE_URL=(str, "http://localhost:8000"),
     BLOCK_MIN_GAP_DAYS=(int, 2),
     PLAUSIBLE_DOMAIN=(str, ""),
+    CONTACT_EMAIL=(str, "hello@example.com"),
+    OPERATOR_NAME=(str, "First5K"),
     EMAIL_BACKEND=(str, ""),
     DEFAULT_FROM_EMAIL=(str, "First5K <hello@localhost>"),
     SECURE_SSL_REDIRECT=(bool, True),
@@ -134,6 +136,9 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 # Product settings
 BLOCK_MIN_GAP_DAYS = env("BLOCK_MIN_GAP_DAYS")
 PLAUSIBLE_DOMAIN = env("PLAUSIBLE_DOMAIN")
+# Shown on the legal pages.
+CONTACT_EMAIL = env("CONTACT_EMAIL")
+OPERATOR_NAME = env("OPERATOR_NAME")
 
 # Security hardening when not in DEBUG.
 if not DEBUG:

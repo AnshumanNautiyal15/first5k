@@ -1,0 +1,51 @@
+# Render Blueprint: web service + hourly email cron + Postgres.
+# New > Blueprint in the Render dashboard, point it at this repo, then fill in the sync:false values.
+databases:
+  - name: first5k-db
+    plan: free
+
+services:
+  - type: web
+    name: first5k
+    runtime: python
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    preDeployCommand: python manage.py migrate --noinput
+    startCommand: gunicorn first5k.wsgi --workers 2 --bind 0.0.0.0:$PORT --access-logfile -
+    healthCheckPath: /robots.txt
+    envVars: &env
+      - key: PYTHON_VERSION
+        value: 3.11.6
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase: { name: first5k-db, property: connectionString }
+      - key: ALLOWED_HOSTS
+        sync: false   # e.g. first5k.onrender.com,first5k.app
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false   # e.g. https://first5k.onrender.com,https://first5k.app
+      - key: SITE_URL
+        sync: false   # e.g. https://first5k.app
+      - key: EMAIL_HOST
+        sync: false
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: DEFAULT_FROM_EMAIL
+        sync: false
+      - key: CONTACT_EMAIL
+        sync: false
+      - key: OPERATOR_NAME
+        sync: false
+      - key: PLAUSIBLE_DOMAIN
+        sync: false
+
+  - type: cron
+    name: first5k-emails
+    runtime: python
+    schedule: "0 * * * *"
+    buildCommand: pip install -r requirements.txt
+    startCommand: python manage.py send_scheduled_emails
+    envVars: *env

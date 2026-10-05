@@ -1,0 +1,32 @@
+{% extends "admin/base_site.html" %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Home</a> &rsaquo; Funnel stats</div>{% endblock %}
+{% block content %}
+<div id="content-main">
+  <p>
+    Cohort:
+    {% for value, label in periods %}
+      {% if value == period %}<strong>{{ label }}</strong>{% else %}<a href="?period={{ value }}">{{ label }}</a>{% endif %}{% if not forloop.last %} · {% endif %}
+    {% endfor %}
+  </p>
+  <table style="width:100%;max-width:760px;margin-top:12px;">
+    <thead><tr><th>Step</th><th style="text-align:right">People</th><th style="text-align:right">% of previous</th><th style="text-align:right">% of started</th><th style="width:35%"></th></tr></thead>
+    <tbody>
+      {% for r in data.rows %}
+        <tr>
+          <td>{{ r.label }}</td>
+          <td style="text-align:right">{{ r.count }}</td>
+          <td style="text-align:right">{% if r.of_prev is not None %}{{ r.of_prev }}%{% else %}–{% endif %}</td>
+          <td style="text-align:right">{% if r.of_top is not None %}{{ r.of_top }}%{% else %}–{% endif %}</td>
+          <td><div style="background:#C2410C;height:12px;border-radius:0 4px 4px 0;width:{{ r.bar }}%" title="{{ r.count }}"></div></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p style="margin-top:8px;color:var(--body-quiet-color)">"Onboarding started" counts browser sessions that answered question 1; later steps count verified users (staff excluded). Finished the whole plan: <strong>{{ data.finished }}</strong>.</p>
+
+  <h2 style="margin-top:24px">Sign-ups by age group</h2>
+  <table style="max-width:360px">
+    {% for label, n in data.ages %}<tr><td>{{ label }}</td><td style="text-align:right">{{ n }}</td></tr>{% endfor %}
+  </table>
+</div>
+{% endblock %}

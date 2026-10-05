@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<article class="prose-legal pt-4">
+  {% block legal %}{% endblock %}
+  <p class="mt-8 text-base text-muted">Last updated: {% block updated %}5 October 2026{% endblock %}. Questions? Email <a href="mailto:{{ CONTACT_EMAIL }}">{{ CONTACT_EMAIL }}</a>.</p>
+</article>
+{% endblock %}

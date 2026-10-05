@@ -10,7 +10,7 @@
         <path d="{{ b.path }}" fill="#C2410C"{% if not b.is_latest %} fill-opacity="0.75"{% endif %}/>
         {% if b.show_value %}<text x="{{ b.cx|floatformat:1 }}" y="{{ b.cap_y|floatformat:1 }}" text-anchor="middle" font-size="11" font-weight="600" fill="#1F2933">{{ b.value }}</text>{% endif %}
         {% if b.x_label %}<text x="{{ b.cx|floatformat:1 }}" y="{{ chart.x_label_y }}" text-anchor="middle" font-size="11" fill="#52606D">{{ b.x_label }}</text>{% endif %}
-        <rect x="{{ b.hit_x|floatformat:1 }}" y="{{ chart.plot_top }}" width="{{ b.hit_w|floatformat:1 }}" height="{{ chart.plot_h }}" fill="transparent" tabindex="0" focusable="true" data-tip="{{ b.tooltip }}" aria-label="{{ b.tooltip }}"><title>{{ b.tooltip }}</title></rect>
+        <rect x="{{ b.hit_x|floatformat:1 }}" y="{{ chart.plot_top }}" width="{{ b.hit_w|floatformat:1 }}" height="{{ chart.plot_h }}" fill="transparent" role="img" tabindex="0" focusable="true" data-tip="{{ b.tooltip }}" aria-label="{{ b.tooltip }}"><title>{{ b.tooltip }}</title></rect>
       </g>
     {% endfor %}
   </svg>

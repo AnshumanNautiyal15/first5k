@@ -1,0 +1,33 @@
+{% extends "core/_legal.html" %}
+{% block title %}Privacy policy · {{ SITE_NAME }}{% endblock %}
+{% block legal %}
+<h1>Privacy policy</h1>
+<p class="mt-4">{{ SITE_NAME }} is run by {{ OPERATOR_NAME }}. We collect as little as we can, and only to run your plan.</p>
+
+<h2 class="mt-8 text-xl">What we store</h2>
+<ul class="mt-3 list-disc space-y-1 pl-6">
+  <li><strong>Your email address</strong>, to log you in and send your plan emails.</li>
+  <li><strong>Your onboarding answers</strong>: how active you are, whether you can jog for a minute, and your age group. These set your starting level and how quickly the plan progresses. We don't ask for your name, exact age, gender or location.</li>
+  <li><strong>Your plan and progress</strong>: blocks, which days you marked done, how each block felt, milestones.</li>
+  <li><strong>Your timezone</strong>, so unlock times and emails fit your day.</li>
+  <li><strong>A record of the emails we sent you</strong>, so we never send the same one twice.</li>
+  <li><strong>Login link requests</strong>, including the IP address, to stop abuse. Old ones are deleted automatically after 30 days.</li>
+</ul>
+
+<h2 class="mt-8 text-xl">What we don't do</h2>
+<ul class="mt-3 list-disc space-y-1 pl-6">
+  <li>We don't sell or share your data with advertisers.</li>
+  <li>We don't use passwords, so there's no password to leak.</li>
+  <li>We only use cookies needed to keep you logged in and protect forms.{% if PLAUSIBLE_DOMAIN %} We use Plausible, a privacy-friendly analytics tool that doesn't use cookies or track you across sites.{% endif %}</li>
+</ul>
+
+<h2 class="mt-8 text-xl">Who processes data for us</h2>
+<p class="mt-3">Our hosting provider stores the database, and our email provider delivers emails. They only process data to provide those services.</p>
+
+<h2 class="mt-8 text-xl">Your choices</h2>
+<ul class="mt-3 list-disc space-y-1 pl-6">
+  <li><strong>Unsubscribe</strong> from plan emails with one click in any email, or from your account page.</li>
+  <li><strong>Download your data</strong> as a file from your account page.</li>
+  <li><strong>Delete your account</strong> from your account page. Your account and plan are deleted immediately and permanently.</li>
+</ul>
+{% endblock %}

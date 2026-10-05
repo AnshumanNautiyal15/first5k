@@ -9,7 +9,6 @@ function renderDone(status, message) {
   status.innerHTML = "";
   const done = document.createElement("p");
   done.className = "btn-done";
-  done.setAttribute("aria-disabled", "true");
   done.innerHTML = '<span aria-hidden="true">✓</span> Done';
   status.appendChild(done);
   if (message) {

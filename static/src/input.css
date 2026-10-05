@@ -16,11 +16,11 @@
   .card { @apply rounded-card bg-white p-5 shadow-sm ring-1 ring-sand; }
   .btn { @apply inline-flex min-h-tap w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-lg font-semibold no-underline transition-colors; }
   .btn-primary { @apply btn bg-accent text-white hover:bg-accent-dark active:bg-accent-dark; }
-  .btn-secondary { @apply btn bg-white text-ink ring-2 ring-sand hover:ring-accent; }
+  .btn-secondary { @apply btn bg-white text-ink ring-2 ring-line hover:ring-accent; }
   .btn-done { @apply btn bg-leaf text-white; }
-  .option { @apply flex min-h-[64px] w-full items-center rounded-card bg-white px-5 py-4 text-left text-lg font-semibold ring-2 ring-sand transition hover:ring-accent; }
+  .option { @apply flex min-h-[64px] w-full items-center rounded-card bg-white px-5 py-4 text-left text-lg font-semibold ring-2 ring-line transition hover:ring-accent; }
   .option[aria-pressed="true"] { @apply ring-accent bg-accent-soft; }
-  .input { @apply block min-h-tap w-full rounded-xl border-2 border-sand bg-white px-4 py-3 text-lg text-ink placeholder:text-muted focus:border-accent; }
+  .input { @apply block min-h-tap w-full rounded-xl border-2 border-line bg-white px-4 py-3 text-lg text-ink placeholder:text-muted focus:border-accent; }
   .eyebrow { @apply text-sm font-semibold uppercase tracking-wider text-accent-dark; }
   .tip { @apply rounded-xl bg-accent-soft px-4 py-3 text-base text-ink; }
 }
