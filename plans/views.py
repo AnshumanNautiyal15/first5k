@@ -36,8 +36,7 @@ def start_jog(request):
     if "activity" not in answers:
         return redirect("plans:start")
     if request.method == "POST" and onboarding.set_jog_ability(request, request.POST.get("answer", "")):
-        # Logged-in users without a journey go straight to their plan.
-        return redirect("plans:today" if request.user.is_authenticated else "plans:preview")
+        return redirect("plans:start_age")
     return render(request, "plans/onboarding_question.html", {
         "step": 2,
         "question": "Could you jog for 1 minute without stopping?",
@@ -48,9 +47,28 @@ def start_jog(request):
     })
 
 
+@require_http_methods(["GET", "POST"])
+def start_age(request):
+    answers = onboarding.get_answers(request)
+    if "jog_ability" not in answers:
+        return redirect("plans:start_jog" if "activity" in answers else "plans:start")
+    if request.method == "POST" and onboarding.set_age_group(request, request.POST.get("answer", "")):
+        # Logged-in users without a journey go straight to their plan.
+        return redirect("plans:today" if request.user.is_authenticated else "plans:preview")
+    return render(request, "plans/onboarding_question.html", {
+        "step": 3,
+        "question": "How old are you?",
+        "hint": "Bodies need different amounts of recovery at different ages. We'll pace your plan to suit you.",
+        "choices": engine.AGE_CHOICES,
+        "selected": answers.get("age_group"),
+        "back_url": "plans:start_jog",
+    })
+
+
 def preview_context(answers: dict) -> dict:
     level = onboarding.starting_level(answers)
     return {
+        "is_minor": answers.get("age_group") == "under_18",
         "level": engine.get_level(level),
         "steps": engine.session_steps(level),
         "total_minutes": engine.session_total_minutes(level),
@@ -77,7 +95,8 @@ def _get_or_create_journey(request) -> Journey | None:
     answers = onboarding.get_answers(request)
     if not onboarding.is_complete(answers):
         return None
-    journey = services.create_journey(request.user, answers["activity"], answers["jog_ability"], answers.get("start_id"))
+    journey = services.create_journey(request.user, answers["activity"], answers["jog_ability"], answers.get("start_id"),
+                                      age_group=answers.get("age_group", ""))
     request.session.pop(onboarding.SESSION_KEY, None)
     return journey
 

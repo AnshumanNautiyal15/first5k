@@ -208,3 +208,55 @@ def test_coming_up_hint():
     assert e.coming_up_hint(5) == "Soon you'll be jogging 5 minutes straight."
     assert e.coming_up_hint(11) == "Soon you'll be heading out for your very first 5K."
     assert e.coming_up_hint(12) is None
+
+
+# --- Age rules ------------------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    "age,expected",
+    [(None, 4), ("", 4), ("18_39", 4), ("40_54", 3), ("55_64", 2), ("65_plus", 2), ("under_18", 2)],
+)
+def test_start_level_capped_by_age(age, expected):
+    assert e.start_level("active", "yes", age) == expected
+
+
+def test_age_cap_never_raises_a_low_start():
+    assert e.start_level("sitting", "not_yet", "65_plus") == 1
+    assert e.start_level("walks", "yes", "40_54") == 3
+
+
+@pytest.mark.parametrize("age", ["55_64", "65_plus", "under_18"])
+def test_cautious_groups_never_jump_two_levels(age):
+    assert e.next_level(3, e.TOO_EASY, previous_feedback=e.TOO_EASY, age_group=age).level == 4
+
+
+@pytest.mark.parametrize("age", [None, "18_39", "40_54"])
+def test_other_groups_can_jump_two(age):
+    assert e.next_level(3, e.TOO_EASY, previous_feedback=e.TOO_EASY, age_group=age).level == 5
+
+
+def test_65_plus_steps_down_on_first_too_hard():
+    assert e.next_level(4, e.TOO_HARD, previous_feedback=e.JUST_RIGHT, age_group="65_plus").level == 3
+    assert e.next_level(1, e.TOO_HARD, age_group="65_plus").level == 1
+    assert e.next_level(4, e.TOO_HARD, previous_feedback=e.JUST_RIGHT, age_group="55_64").level == 4
+
+
+def test_just_right_and_finish_unaffected_by_age():
+    assert e.next_level(3, e.JUST_RIGHT, age_group="65_plus").level == 4
+    assert e.next_level(12, e.JUST_RIGHT, age_group="65_plus").journey_complete
+
+
+@pytest.mark.parametrize(
+    "age,expected", [(None, 2), ("18_39", 2), ("40_54", 2), ("55_64", 3), ("65_plus", 3), ("under_18", 3)],
+)
+def test_min_gap_days_by_age(age, expected):
+    assert e.min_gap_days(age, 2) == expected
+
+
+def test_min_gap_setting_wins_if_larger():
+    assert e.min_gap_days("65_plus", 4) == 4
+
+
+def test_every_age_choice_has_rules():
+    for value, _ in e.AGE_CHOICES:
+        assert value in e.AGE_RULES

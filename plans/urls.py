@@ -7,6 +7,7 @@ app_name = "plans"
 urlpatterns = [
     path("start/", views.start_activity, name="start"),
     path("start/2/", views.start_jog, name="start_jog"),
+    path("start/3/", views.start_age, name="start_age"),
     path("your-first-block/", views.preview, name="preview"),
     path("today/", views.today, name="today"),
     path("progress/", views.progress, name="progress"),

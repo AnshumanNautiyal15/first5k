@@ -29,15 +29,16 @@ def create_block(journey: Journey, *, index: int, level: int, unlocks_at, status
 
 
 @transaction.atomic
-def create_journey(user, activity: str, jog_ability: str, onboarding_start_id=None, now=None) -> Journey:
+def create_journey(user, activity: str, jog_ability: str, onboarding_start_id=None, now=None,
+                   age_group: str = "") -> Journey:
     """Create the user's journey and an active Block 1. Idempotent per user."""
     now = now or timezone.now()
     existing = Journey.objects.filter(user=user).first()
     if existing:
         return existing
-    level = engine.start_level(activity, jog_ability)
+    level = engine.start_level(activity, jog_ability, age_group)
     journey = Journey.objects.create(
-        user=user, start_activity=activity, start_jog_ability=jog_ability,
+        user=user, start_activity=activity, start_jog_ability=jog_ability, age_group=age_group,
         current_level=level, last_activity_at=now,
     )
     create_block(journey, index=1, level=level, unlocks_at=now, status=Block.Status.ACTIVE, started_at=now)
@@ -151,7 +152,7 @@ def submit_feedback(block: Block, feedback: str, now=None) -> FeedbackResult:
             return FeedbackResult("", nxt, journey.is_complete, [])
 
         prev = previous_block(block)
-        step = engine.next_level(block.level, feedback, prev.feedback if prev else None)
+        step = engine.next_level(block.level, feedback, prev.feedback if prev else None, journey.age_group)
 
         block.feedback = feedback
         block.completed_at = now
@@ -171,7 +172,8 @@ def submit_feedback(block: Block, feedback: str, now=None) -> FeedbackResult:
             started = block.started_at or block.unlocks_at
             next_block = create_block(
                 journey, index=block.index + 1, level=step.level,
-                unlocks_at=engine.unlock_time(started, now, settings.BLOCK_MIN_GAP_DAYS),
+                unlocks_at=engine.unlock_time(
+                    started, now, engine.min_gap_days(journey.age_group, settings.BLOCK_MIN_GAP_DAYS)),
             )
             journey.current_level = step.level
         journey.save()

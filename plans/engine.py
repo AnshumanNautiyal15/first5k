@@ -198,9 +198,42 @@ _START_LEVELS = {
 }
 
 
-def start_level(activity: str, jog_ability: str) -> int:
+# --- Age groups ---------------------------------------------------------------
+# Older (and under-18) beginners get a gentler start, smaller jumps and more recovery.
+# Unknown/blank age uses the default rules (journeys created before age was asked).
+
+AGE_CHOICES = [
+    ("under_18", "Under 18"),
+    ("18_39", "18–39"),
+    ("40_54", "40–54"),
+    ("55_64", "55–64"),
+    ("65_plus", "65 or over"),
+]
+
+DEFAULT_AGE_RULES = {"max_start": MAX_LEVEL, "max_step": 2, "min_gap_days": 0, "step_down_on_first_too_hard": False}
+_CAUTIOUS = {"max_start": 2, "max_step": 1, "min_gap_days": 3, "step_down_on_first_too_hard": False}
+AGE_RULES: dict[str, dict] = {
+    "18_39": DEFAULT_AGE_RULES,
+    "40_54": {**DEFAULT_AGE_RULES, "max_start": 3},
+    "55_64": _CAUTIOUS,
+    "65_plus": {**_CAUTIOUS, "step_down_on_first_too_hard": True},
+    "under_18": _CAUTIOUS,
+}
+
+
+def age_rules(age_group: str | None) -> dict:
+    return AGE_RULES.get(age_group or "", DEFAULT_AGE_RULES)
+
+
+def min_gap_days(age_group: str | None, default: int) -> int:
+    """Days between block starts: the site setting, or more for age groups that need extra recovery."""
+    return max(default, age_rules(age_group)["min_gap_days"])
+
+
+def start_level(activity: str, jog_ability: str, age_group: str | None = None) -> int:
     """Map onboarding answers to a starting level. Unknown answers start at 1."""
-    return _START_LEVELS.get((activity, jog_ability), MIN_LEVEL)
+    level = _START_LEVELS.get((activity, jog_ability), MIN_LEVEL)
+    return min(level, age_rules(age_group)["max_start"])
 
 
 # --- Progression after feedback -----------------------------------------------
@@ -223,25 +256,28 @@ class NextStep:
     journey_complete: bool = False
 
 
-def next_level(current: int, feedback: str, previous_feedback: str | None = None) -> NextStep:
+def next_level(current: int, feedback: str, previous_feedback: str | None = None,
+               age_group: str | None = None) -> NextStep:
     """
     Decide the next block's level from this block's feedback.
 
     previous_feedback is the feedback given on the block before this one
     (None if there wasn't one), used for the "twice in a row" rules.
+    age_group applies the age rules (max jump size, earlier step down).
     """
     current = clamp_level(current)
+    rules = age_rules(age_group)
 
     if current == MAX_LEVEL and feedback in (TOO_EASY, JUST_RIGHT):
         return NextStep(level=MAX_LEVEL, journey_complete=True)
 
     if feedback == TOO_EASY:
         step = 2 if previous_feedback == TOO_EASY else 1
-        return NextStep(clamp_level(current + step))
+        return NextStep(clamp_level(current + min(step, rules["max_step"])))
     if feedback == JUST_RIGHT:
         return NextStep(clamp_level(current + 1))
     if feedback == TOO_HARD:
-        if previous_feedback == TOO_HARD:
+        if previous_feedback == TOO_HARD or rules["step_down_on_first_too_hard"]:
             return NextStep(clamp_level(current - 1))
         return NextStep(current)
     # DIDNT_DO (or anything unknown): repeat, never punish.

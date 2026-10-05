@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from plans import engine, messages, services
-from plans.models import Block, DayLog, Milestone
+from plans.models import Block, DayLog, Journey, Milestone
 
 from .factories import make_journey, make_user
 
@@ -326,3 +326,21 @@ def test_run_day_shows_lesson_and_fuel(logged_in):
     body = client.get(reverse("plans:today")).content.decode()
     assert "Running word:" in body and "Aerobic base" in body  # level 2
     assert "Fuel ideas" in body and "Recovery &amp; adaptation" in body
+
+
+def test_older_runner_waits_three_days():
+    journey = make_journey(now=T0, age="65_plus")
+    result = finish_block(journey, engine.JUST_RIGHT, T0 + timedelta(hours=2))
+    assert result.next_block.unlocks_at == T0 + timedelta(days=3)
+
+
+def test_age_group_stored_on_journey_from_signup(client):
+    from django.core import mail
+    from .factories import answer_onboarding
+    from .test_auth import link_from_mail, path_of
+
+    answer_onboarding(client, "active", "yes", age="55_64")
+    client.post(reverse("accounts:signup"), {"email": "older@example.com"})
+    client.post(path_of(link_from_mail(mail.outbox[0])))
+    journey = Journey.objects.get(user__email="older@example.com")
+    assert journey.age_group == "55_64" and journey.current_level == 2

@@ -11,6 +11,7 @@ class OnboardingStart(models.Model):
     session_key = models.CharField(max_length=40, db_index=True)
     activity = models.CharField(max_length=16, choices=engine.ACTIVITY_CHOICES, blank=True)
     jog_ability = models.CharField(max_length=16, choices=engine.JOG_CHOICES, blank=True)
+    age_group = models.CharField(max_length=16, choices=engine.AGE_CHOICES, blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -22,6 +23,7 @@ class Journey(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="journey")
     start_activity = models.CharField(max_length=16, choices=engine.ACTIVITY_CHOICES, blank=True)
     start_jog_ability = models.CharField(max_length=16, choices=engine.JOG_CHOICES, blank=True)
+    age_group = models.CharField(max_length=16, choices=engine.AGE_CHOICES, blank=True)
     current_level = models.PositiveSmallIntegerField(default=1)
     blocks_completed = models.PositiveIntegerField(default=0)
     last_activity_at = models.DateTimeField(default=timezone.now)

@@ -52,8 +52,11 @@ def test_q2_requires_q1(client):
 def test_full_flow_to_preview(client):
     client.post(reverse("plans:start"), {"answer": "walks"})
     resp = client.post(reverse("plans:start_jog"), {"answer": "yes"})
-    assert resp.url == reverse("plans:preview")
+    assert resp.url == reverse("plans:start_age")
     assert OnboardingStart.objects.get().jog_ability == "yes"
+    resp = client.post(reverse("plans:start_age"), {"answer": "18_39"})
+    assert resp.url == reverse("plans:preview")
+    assert OnboardingStart.objects.get().age_group == "18_39"
 
     resp = client.get(reverse("plans:preview"))
     assert resp.status_code == 200
@@ -78,3 +81,36 @@ def test_onboarding_post_requires_csrf():
     csrf_client = Client(enforce_csrf_checks=True)
     resp = csrf_client.post(reverse("plans:start"), {"answer": "walks"})
     assert resp.status_code == 403
+
+
+def test_q3_age_question(client):
+    client.post(reverse("plans:start"), {"answer": "walks"})
+    client.post(reverse("plans:start_jog"), {"answer": "yes"})
+    body = client.get(reverse("plans:start_age")).content.decode()
+    assert "How old are you?" in body and "Question 3 of 3" in body and "65 or over" in body
+    assert "gender" not in body.lower()
+
+
+def test_q3_requires_q2(client):
+    client.post(reverse("plans:start"), {"answer": "walks"})
+    assert client.get(reverse("plans:start_age")).url == reverse("plans:start_jog")
+
+
+def test_preview_requires_age(client):
+    client.post(reverse("plans:start"), {"answer": "walks"})
+    client.post(reverse("plans:start_jog"), {"answer": "yes"})
+    assert client.get(reverse("plans:preview")).url == reverse("plans:start")
+
+
+def test_older_runner_gets_capped_start(client):
+    client.post(reverse("plans:start"), {"answer": "active"})
+    client.post(reverse("plans:start_jog"), {"answer": "yes"})  # level 4 by default
+    client.post(reverse("plans:start_age"), {"answer": "65_plus"})
+    assert client.get(reverse("plans:preview")).context["level"]["number"] == 2
+
+
+def test_under_18_sees_guardian_note(client):
+    client.post(reverse("plans:start"), {"answer": "walks"})
+    client.post(reverse("plans:start_jog"), {"answer": "maybe"})
+    client.post(reverse("plans:start_age"), {"answer": "under_18"})
+    assert "parent or guardian" in client.get(reverse("plans:preview")).content.decode()

@@ -7,6 +7,7 @@ SESSION_KEY = "onboarding"
 
 _VALID_ACTIVITY = {value for value, _ in engine.ACTIVITY_CHOICES}
 _VALID_JOG = {value for value, _ in engine.JOG_CHOICES}
+_VALID_AGE = {value for value, _ in engine.AGE_CHOICES}
 
 
 def get_answers(request) -> dict:
@@ -39,9 +40,19 @@ def set_jog_ability(request, jog_ability: str) -> bool:
     return True
 
 
+def set_age_group(request, age_group: str) -> bool:
+    answers = get_answers(request)
+    if age_group not in _VALID_AGE or "jog_ability" not in answers:
+        return False
+    answers["age_group"] = age_group
+    request.session[SESSION_KEY] = answers
+    OnboardingStart.objects.filter(pk=answers.get("start_id")).update(age_group=age_group)
+    return True
+
+
 def is_complete(answers: dict) -> bool:
-    return "activity" in answers and "jog_ability" in answers
+    return all(k in answers for k in ("activity", "jog_ability", "age_group"))
 
 
 def starting_level(answers: dict) -> int:
-    return engine.start_level(answers.get("activity", ""), answers.get("jog_ability", ""))
+    return engine.start_level(answers.get("activity", ""), answers.get("jog_ability", ""), answers.get("age_group"))

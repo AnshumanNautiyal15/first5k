@@ -6,8 +6,8 @@ from .models import Block, DayLog, Journey, Milestone, OnboardingStart
 
 @admin.register(OnboardingStart)
 class OnboardingStartAdmin(admin.ModelAdmin):
-    list_display = ("id", "activity", "jog_ability", "user", "created_at")
-    list_filter = ("activity", "jog_ability", "created_at")
+    list_display = ("id", "activity", "jog_ability", "age_group", "user", "created_at")
+    list_filter = ("activity", "jog_ability", "age_group", "created_at")
 
 
 class BlockInline(admin.TabularInline):
@@ -20,7 +20,7 @@ class BlockInline(admin.TabularInline):
 @admin.register(Journey)
 class JourneyAdmin(admin.ModelAdmin):
     list_display = ("user", "current_level", "blocks_completed", "last_activity_at", "completed_at", "created_at")
-    list_filter = ("current_level", "start_activity", "start_jog_ability", ("completed_at", admin.EmptyFieldListFilter))
+    list_filter = ("current_level", "age_group", "start_activity", "start_jog_ability", ("completed_at", admin.EmptyFieldListFilter))
     search_fields = ("user__email",)
     inlines = [BlockInline]
 

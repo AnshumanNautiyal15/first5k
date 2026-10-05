@@ -105,7 +105,8 @@ def verify(request, token):
     if not hasattr(user, "journey"):
         if not onboarding.is_complete(answers):
             return redirect("plans:start")
-        services.create_journey(user, answers["activity"], answers["jog_ability"], answers.get("start_id"))
+        services.create_journey(user, answers["activity"], answers["jog_ability"], answers.get("start_id"),
+                                age_group=answers.get("age_group", ""))
         request.session.pop(onboarding.SESSION_KEY, None)
     return redirect("plans:today")
 

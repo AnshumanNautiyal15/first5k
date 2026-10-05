@@ -6,6 +6,7 @@
 
 <h1 class="mt-6">{% if current.entry_note == "welcome_back" or current.entry_note == "ease_down" %}Welcome back! Your next 2 days{% else %}Your next 2 days{% endif %}</h1>
 <p class="mt-1 text-muted">Do them in any order that suits you. Slow is fine.</p>
+{% if is_minor %}<div class="mt-4">{% include "partials/minor_note.html" %}</div>{% endif %}
 
 <div class="mt-6 space-y-4">
   {% for card in cards %}
