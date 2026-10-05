@@ -85,7 +85,7 @@ Every host needs the same four things:
 
 Set `DEBUG=False`, `SECRET_KEY`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, `SITE_URL`, `DATABASE_URL` and the `EMAIL_*` variables. Run `python manage.py check --deploy` to confirm. Static files are served by WhiteNoise with hashed, long-cached filenames.
 
-- **Render:** `render.yaml` is a Blueprint (web service, hourly cron job and Postgres). Choose New → Blueprint, select the repo, and fill in the values marked `sync: false`.
+- **Render (recommended):** `render.yaml` is a Blueprint (web service, hourly cron job, Postgres and a shared settings group). **Step-by-step guide: [docs/deploy-render.md](docs/deploy-render.md).**
 - **Railway:** add a Postgres plugin and deploy the repo. The `Procfile` provides `web` and `release`. Set the build command above, and add a second service using the same repo with a cron schedule `0 * * * *` running `python manage.py send_scheduled_emails`.
 - **Fly.io:** `fly launch` (choose Postgres), set secrets with `fly secrets set`, use `release_command = "python manage.py migrate --noinput"` in `fly.toml`, and run the email command hourly with a scheduled Machine (`fly machine run . --schedule hourly --command "python manage.py send_scheduled_emails"`).
 

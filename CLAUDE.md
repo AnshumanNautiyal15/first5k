@@ -20,7 +20,7 @@ make css-watch
 .venv/bin/python manage.py seed_demo               # DEBUG only: 7 demo users at different stages + login links
 ```
 
-Deployment is described in README.md (`Procfile`, `render.yaml`). Funnel stats live at `/admin/stats/` (`core/stats.py`, registered by patching `admin.site.get_urls` in `core/admin.py`).
+Deployment is described in README.md and `docs/deploy-render.md` (`Procfile`, `render.yaml`). On Render, `SECRET_KEY` must live only in the shared `first5k-settings` env group: the cron job signs unsubscribe links that the web service verifies. Funnel stats live at `/admin/stats/` (`core/stats.py`, registered by patching `admin.site.get_urls` in `core/admin.py`).
 
 After changing Tailwind classes in templates or JS, run `make css` and commit `static/css/app.css`; production never runs the CLI.
 

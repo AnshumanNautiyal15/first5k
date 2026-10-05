@@ -1,51 +1,70 @@
-# Render Blueprint: web service + hourly email cron + Postgres.
-# New > Blueprint in the Render dashboard, point it at this repo, then fill in the sync:false values.
-databases:
-  - name: first5k-db
-    plan: free
+# Render Blueprint: web service + hourly email cron + Postgres, all in Singapore.
+# Dashboard: New > Blueprint > pick this repo, then fill in the values marked sync:false.
+# Full walkthrough: docs/deploy-render.md
 
-services:
-  - type: web
-    name: first5k
-    runtime: python
-    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
-    preDeployCommand: python manage.py migrate --noinput
-    startCommand: gunicorn first5k.wsgi --workers 2 --bind 0.0.0.0:$PORT --access-logfile -
-    healthCheckPath: /robots.txt
-    envVars: &env
+envVarGroups:
+  # Shared by the web service AND the cron job. SECRET_KEY must be identical in both:
+  # the cron job signs unsubscribe links that the web service has to verify.
+  - name: first5k-settings
+    envVars:
       - key: PYTHON_VERSION
         value: 3.11.6
       - key: DEBUG
         value: "False"
       - key: SECRET_KEY
         generateValue: true
-      - key: DATABASE_URL
-        fromDatabase: { name: first5k-db, property: connectionString }
-      - key: ALLOWED_HOSTS
-        sync: false   # e.g. first5k.onrender.com,first5k.app
-      - key: CSRF_TRUSTED_ORIGINS
-        sync: false   # e.g. https://first5k.onrender.com,https://first5k.app
       - key: SITE_URL
-        sync: false   # e.g. https://first5k.app
+        sync: false   # e.g. https://first5k.onrender.com or https://yourdomain.com
+      - key: ALLOWED_HOSTS
+        sync: false   # extra hosts, e.g. yourdomain.com,www.yourdomain.com (the onrender.com host is added automatically)
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false   # e.g. https://yourdomain.com,https://www.yourdomain.com
       - key: EMAIL_HOST
         sync: false
+      - key: EMAIL_PORT
+        value: "587"
       - key: EMAIL_HOST_USER
         sync: false
       - key: EMAIL_HOST_PASSWORD
         sync: false
       - key: DEFAULT_FROM_EMAIL
-        sync: false
+        sync: false   # e.g. First5K <hello@yourdomain.com>
       - key: CONTACT_EMAIL
         sync: false
       - key: OPERATOR_NAME
         sync: false
       - key: PLAUSIBLE_DOMAIN
-        sync: false
+        sync: false   # leave empty to disable analytics
+
+databases:
+  - name: first5k-db
+    region: singapore
+    plan: free   # fine for trying it out; upgrade to a paid plan before real users (free databases expire)
+
+services:
+  - type: web
+    name: first5k
+    runtime: python
+    region: singapore
+    plan: starter   # paid: stays awake (free web services sleep) and supports preDeployCommand
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    preDeployCommand: python manage.py migrate --noinput
+    startCommand: gunicorn first5k.wsgi --workers 2 --bind 0.0.0.0:$PORT --access-logfile -
+    healthCheckPath: /robots.txt
+    envVars:
+      - fromGroup: first5k-settings
+      - key: DATABASE_URL
+        fromDatabase: { name: first5k-db, property: connectionString }
 
   - type: cron
     name: first5k-emails
     runtime: python
-    schedule: "0 * * * *"
+    region: singapore
+    plan: starter
+    schedule: "0 * * * *"   # hourly (UTC); the app itself only emails people 08:00-20:00 in their own timezone
     buildCommand: pip install -r requirements.txt
     startCommand: python manage.py send_scheduled_emails
-    envVars: *env
+    envVars:
+      - fromGroup: first5k-settings
+      - key: DATABASE_URL
+        fromDatabase: { name: first5k-db, property: connectionString }

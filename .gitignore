@@ -1,9 +1,35 @@
+# Python
 .venv/
+venv/
 __pycache__/
-*.pyc
+*.py[cod]
+*.egg-info/
+
+# Secrets & local config (commit .env.example instead)
 .env
+.env.*
+!.env.example
+.claude/settings.local.json
+
+# Local data
 db.sqlite3
+db.sqlite3-journal
+*.sqlite3
+media/
+
+# Build output (static/css/app.css IS committed; collectstatic output is not)
 staticfiles/
 bin/
+
+# Tests & tooling
 .pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# Editors & OS
+.idea/
+.vscode/
+*.swp
 .DS_Store
+Thumbs.db

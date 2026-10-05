@@ -33,6 +33,12 @@ SECRET_KEY = env("SECRET_KEY", default="dev-only-insecure-key" if DEBUG else env
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS")
 
+# On Render, trust the service's own *.onrender.com hostname automatically.
+RENDER_EXTERNAL_HOSTNAME = env("RENDER_EXTERNAL_HOSTNAME", default="")
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
+
 # Public base URL, used in emails, share cards and Open Graph tags.
 SITE_URL = env("SITE_URL").rstrip("/")
 SITE_NAME = "First5K"
@@ -144,6 +150,7 @@ OPERATOR_NAME = env("OPERATOR_NAME")
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_SSL_REDIRECT = env("SECURE_SSL_REDIRECT")
+    SECURE_REDIRECT_EXEMPT = [r"^robots\.txt$"]  # health checks may come over plain HTTP
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 60 * 60 * 24 * 365
