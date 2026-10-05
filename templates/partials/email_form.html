@@ -1,0 +1,9 @@
+{# Expects: form, action, button #}
+<form method="post" action="{{ action }}" class="space-y-3" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="tip" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>{% endif %}
+  <label for="{{ form.email.id_for_label }}" class="block font-semibold">Your email</label>
+  {{ form.email }}
+  {% if form.email.errors %}<p class="text-base text-accent-dark" role="alert">That doesn't look like an email address. Mind checking it?</p>{% endif %}
+  <button type="submit" class="btn-primary">{{ button }}</button>
+</form>

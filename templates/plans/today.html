@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Your next 2 days · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+{% include "partials/progress.html" %}
+
+<h1 class="mt-6">Your next 2 days</h1>
+<p class="mt-1 text-muted">Do them in any order that suits you. Slow is fine.</p>
+
+<div class="mt-6 space-y-4">
+  {% for card in cards %}
+    {% with day=card.day %}
+    <article class="card" id="day-{{ day.day_number }}" data-day-card>
+      {% if day.kind == "run" %}
+        <p class="eyebrow">Day {{ day.day_number }} · Run</p>
+        {% include "plans/_run_day.html" with level=card.level steps=card.steps total_minutes=card.total_minutes %}
+      {% else %}
+        <p class="eyebrow text-leaf">Day {{ day.day_number }} · Rest</p>
+        <h3 class="text-xl font-bold">Recover and feel good</h3>
+        <p class="text-muted">{{ rest_text }}</p>
+      {% endif %}
+
+      <div class="mt-5" data-day-status>
+        {% if day.completed_at %}
+          <p class="btn-done" aria-disabled="true"><span aria-hidden="true">✓</span> Done</p>
+          {% if day.compliment %}<p class="mt-3 text-center">{{ day.compliment }}</p>{% endif %}
+        {% else %}
+          <form method="post" action="{% url 'plans:complete_day' day.id %}" data-complete-form>
+            {% csrf_token %}
+            <button type="submit" class="btn-primary">
+              {% if day.kind == "run" %}Mark day complete{% else %}I rested <span aria-hidden="true">🙂</span>{% endif %}
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    </article>
+    {% endwith %}
+  {% endfor %}
+</div>
+
+<section class="card mt-6 text-center" data-block-done {% if not current.all_days_done %}hidden{% endif %}>
+  <p class="text-4xl" aria-hidden="true">🎉</p>
+  <h2 class="mt-2">Both days done!</h2>
+  <p class="mt-2 text-muted">Brilliant work. Your next 2 days are being lined up.</p>
+</section>
+
+<p class="sr-only" aria-live="polite" data-live-region></p>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{% static 'js/complete.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "emails/base.html" %}
+{% block body %}
+  {% if is_signup %}
+    <p style="margin:0 0 12px;font-size:22px;font-weight:700;">You're one tap away from your first 2 days.</p>
+    <p style="margin:0;">Tap the button below to open your plan. That's all, no password needed.</p>
+  {% else %}
+    <p style="margin:0 0 12px;font-size:22px;font-weight:700;">Welcome back!</p>
+    <p style="margin:0;">Tap the button below to log in to {{ SITE_NAME }}.</p>
+  {% endif %}
+  {% include "emails/_button.html" with url=link label="Open my plan" %}
+  <p style="margin:0;font-size:15px;color:#52606D;">This link works once and expires in 15 minutes. If you didn't ask for it, you can safely ignore this email.</p>
+{% endblock %}

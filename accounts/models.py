@@ -41,3 +41,21 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+class MagicLoginToken(models.Model):
+    """
+    A single-use, short-lived login link. Only the SHA-256 hash of the token is stored.
+    Onboarding answers ride along so they survive opening the link in another browser.
+    """
+
+    email = models.EmailField(db_index=True)
+    token_hash = models.CharField(max_length=64, unique=True)
+    ip = models.GenericIPAddressField(null=True, blank=True, db_index=True)
+    onboarding = models.JSONField(default=dict, blank=True)
+    expires_at = models.DateTimeField()
+    used_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(default=dj_timezone.now, db_index=True)
+
+    def __str__(self):
+        return f"Login link for {self.email} ({self.created_at:%Y-%m-%d %H:%M})"

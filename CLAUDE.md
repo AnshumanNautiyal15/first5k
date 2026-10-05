@@ -23,10 +23,13 @@ After changing Tailwind classes in templates or JS, run `make css` and commit `s
 ## Architecture
 
 - `plans/engine.py` is the pure-Python progression engine (no Django imports). Levels are a data list (`LEVELS`); starting level, next level after feedback, gap rules, unlock timing, milestones and progress hints are plain functions. Change training rules here, as data where possible, and cover them in `tests/test_engine.py`. Block layout (`("run", "rest")`) is configurable per level via `BLOCK_LAYOUT_OVERRIDES`.
-- DB orchestration that applies engine rules belongs in `plans/services.py`, not in views. All progression is decided server-side; JS only calls endpoints.
+- DB orchestration that applies engine rules belongs in `plans/services.py`, not in views. Compliments come from `plans/messages.py` (grouped, keyed `group:index`, never repeating `Journey.last_message_key`). All progression is decided server-side; JS only calls endpoints.
 - Onboarding answers live in the anonymous session (`plans/onboarding.py`, key `"onboarding"`) until the user verifies a magic link. Each onboarding run also creates an `OnboardingStart` row for the admin funnel.
 - Apps: `core` (landing, legal, stats), `accounts` (custom passwordless `User` with email as username; only staff have passwords, for /admin), `plans` (journey/blocks/onboarding), `notifications` (emails, `EmailLog`, scheduled-email command).
 - Settings are a single env-driven `first5k/settings.py` (django-environ, `.env` locally; see `.env.example`). An empty `DATABASE_URL` falls back to SQLite. `BLOCK_MIN_GAP_DAYS` and `SITE_URL` are product settings.
+- Auth (`accounts/magic_link.py`): only the SHA-256 of a token is stored; users are created on first *verified* login, not when the email is entered. `/auth/verify/<token>/` GET only shows a confirm button and POST redeems it, because mail scanners prefetch links. Onboarding answers are copied onto the token so opening the link in a different browser still works.
+- Interactive endpoints (e.g. `plans:complete_day`) return JSON when the request sends `Accept: application/json` (see `static/js/api.js`), otherwise they redirect with a flash message (the no-JS fallback).
+- Never name a template context variable `block`: Django reserves it inside `{% block %}` tags. Views pass the current block as `current`.
 - `tests/conftest.py` forces non-manifest static storage, no SSL redirect and the locmem email backend, so tests pass whatever `DEBUG` is.
 
 ## Conventions

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Log in · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<h1 class="pt-4">Welcome back</h1>
+<p class="mt-2 text-muted">Pop in your email and we'll send you a one-tap login link. No password needed.</p>
+<div class="mt-6">
+  {% url 'accounts:login' as login_url %}
+  {% include "partials/email_form.html" with action=login_url button="Email me a link" %}
+</div>
+<p class="mt-6 text-base text-muted">New here? <a href="{% url 'plans:start' %}">Start your first 2 days</a>.</p>
+{% endblock %}

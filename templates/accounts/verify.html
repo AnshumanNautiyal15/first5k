@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{% if valid %}Open your plan{% else %}Link expired{% endif %} · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="pt-8 text-center">
+  {% if valid %}
+    <p class="text-6xl" aria-hidden="true">👟</p>
+    <h1 class="mt-4">You're nearly in</h1>
+    <p class="mt-3 text-muted">One tap and you'll see your plan.</p>
+    <form method="post" class="mt-6">{% csrf_token %}<button type="submit" class="btn-primary">Open my plan</button></form>
+  {% else %}
+    <p class="text-6xl" aria-hidden="true">⏳</p>
+    <h1 class="mt-4">This link has expired</h1>
+    <p class="mt-3 text-muted">Login links only work once and for 15 minutes, to keep your account safe. No worries, here's a fresh one:</p>
+    <div class="mt-6 text-left">
+      {% url 'accounts:login' as login_url %}
+      {% include "partials/email_form.html" with action=login_url button="Email me a new link" %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

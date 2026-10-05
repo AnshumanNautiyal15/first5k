@@ -1,0 +1,10 @@
+{# Expects: current, total_blocks, hint #}
+<section aria-label="Your progress" class="mt-2">
+  <div class="flex items-baseline justify-between text-base">
+    <span class="font-semibold">Block {{ current.index }} <span class="font-normal text-muted">of about {{ total_blocks }}</span></span>
+  </div>
+  <div class="mt-2 h-3 w-full overflow-hidden rounded-full bg-sand" role="progressbar" aria-valuemin="0" aria-valuemax="{{ total_blocks }}" aria-valuenow="{{ current.index }}" aria-label="Block {{ current.index }} of about {{ total_blocks }}">
+    <div class="h-full rounded-full bg-accent" style="width: {% widthratio current.index total_blocks 100 %}%"></div>
+  </div>
+  {% if hint %}<p class="mt-2 text-base text-muted">{{ hint }}</p>{% endif %}
+</section>

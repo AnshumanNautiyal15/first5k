@@ -1,0 +1,12 @@
+{% autoescape off %}{% if is_signup %}You're one tap away from your first 2 days.
+
+Open this link to see your plan (no password needed):{% else %}Welcome back!
+
+Open this link to log in to {{ SITE_NAME }}:{% endif %}
+{{ link }}
+
+This link works once and expires in 15 minutes. If you didn't ask for it, you can safely ignore this email.
+
+- {{ SITE_NAME }}
+Not medical advice. Stop if something hurts.
+{% endautoescape %}
