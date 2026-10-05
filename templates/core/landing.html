@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="pt-6 text-center">
+  <p class="eyebrow">For total beginners</p>
+  <h1 class="mt-2 text-4xl">Your first 5K, 2 days at a time.</h1>
+  <p class="mt-4 text-muted">No giant schedule. No pressure. Just the next two days, made for you.</p>
+</section>
+
+<ol class="mt-8 space-y-4" aria-label="How it works">
+  <li class="card flex gap-4">
+    <span class="text-3xl" aria-hidden="true">🙋</span>
+    <div><h2 class="text-xl">Answer 2 quick questions</h2><p class="text-muted">So we can start you at the right, gentle level.</p></div>
+  </li>
+  <li class="card flex gap-4">
+    <span class="text-3xl" aria-hidden="true">👟</span>
+    <div><h2 class="text-xl">Do your next 2 days</h2><p class="text-muted">One easy run and one rest day. Slow is fine, walking is always allowed.</p></div>
+  </li>
+  <li class="card flex gap-4">
+    <span class="text-3xl" aria-hidden="true">💬</span>
+    <div><h2 class="text-xl">Tell us how it felt</h2><p class="text-muted">We'll shape your next 2 days around you.</p></div>
+  </li>
+</ol>
+
+<div class="mt-8">
+  <a href="{% url 'plans:start' %}" class="btn-primary">Start my first 2 days</a>
+  <p class="mt-3 text-center text-base text-muted">No password. No spam.</p>
+</div>
+{% endblock %}

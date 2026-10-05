@@ -1,0 +1,36 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ SITE_NAME }}: your first 5K, 2 days at a time{% endblock %}</title>
+  <meta name="description" content="{% block description %}A gentle running plan for total beginners. See only your next 2 days, tell us how it felt, and we'll adapt the rest. Slow is fine.{% endblock %}">
+  <meta name="theme-color" content="#FBF7F0">
+  <meta property="og:site_name" content="{{ SITE_NAME }}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{% block og_title %}{{ SITE_NAME }}: your first 5K, 2 days at a time{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}A gentle running plan for total beginners. Only ever 2 days at a time.{% endblock %}">
+  <meta property="og:url" content="{{ SITE_URL }}{{ request.path }}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👟</text></svg>">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% if PLAUSIBLE_DOMAIN %}<script defer data-domain="{{ PLAUSIBLE_DOMAIN }}" src="https://plausible.io/js/script.js"></script>{% endif %}
+  {% block head %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col">
+  <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2">Skip to content</a>
+  <header class="container-narrow flex items-center justify-between py-4">
+    <a href="/" class="text-xl font-bold no-underline" aria-label="{{ SITE_NAME }} home"><span aria-hidden="true">👟</span> {{ SITE_NAME }}</a>
+    {% block header_extra %}{% endblock %}
+  </header>
+  <main id="main" class="container-narrow flex-1 pb-12">
+    {% if messages %}
+      <div class="mb-4 space-y-2" role="status">
+        {% for message in messages %}<p class="tip">{{ message }}</p>{% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  {% include "partials/footer.html" %}
+  {% block scripts %}{% endblock %}
+</body>
+</html>

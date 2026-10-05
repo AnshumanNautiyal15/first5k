@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Your first 2 days · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<section class="pt-4">
+  <p class="eyebrow">Made for you</p>
+  <h1 class="mt-2">Here are your first 2 days</h1>
+  <p class="mt-2 text-muted">This is all you need to think about right now. Nothing more.</p>
+</section>
+
+<div class="mt-6 space-y-4">
+  <article class="card">
+    <p class="eyebrow">Day 1 · Run</p>
+    {% include "plans/_run_day.html" %}
+  </article>
+  <article class="card">
+    <p class="eyebrow text-leaf">Day 2 · Rest</p>
+    <h3 class="text-xl font-bold">Recover and feel good</h3>
+    <p class="text-muted">{{ rest_text }}</p>
+  </article>
+</div>
+
+<div class="mt-6">{% include "partials/safety_note.html" %}</div>
+
+{% endblock %}

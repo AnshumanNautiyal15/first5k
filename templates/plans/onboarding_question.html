@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ question }} · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<p class="eyebrow pt-4">Question {{ step }} of 2</p>
+<form method="post" class="mt-2">
+  {% csrf_token %}
+  <fieldset>
+    <legend><h1>{{ question }}</h1></legend>
+    <p class="mt-2 text-muted">{{ hint }}</p>
+    <div class="mt-6 space-y-3">
+      {% for value, label in choices %}
+        <button type="submit" name="answer" value="{{ value }}" class="option" aria-pressed="{% if value == selected %}true{% else %}false{% endif %}">{{ label }}</button>
+      {% endfor %}
+    </div>
+  </fieldset>
+</form>
+{% if back_url %}<p class="mt-6"><a href="{% url back_url %}" class="text-base text-muted">← Back</a></p>{% endif %}
+{% endblock %}

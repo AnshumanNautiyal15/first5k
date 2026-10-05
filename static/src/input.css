@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body { @apply bg-cream text-ink font-sans text-lg leading-relaxed antialiased; }
+  h1 { @apply text-3xl font-bold leading-tight tracking-tight; }
+  h2 { @apply text-2xl font-bold leading-snug; }
+  a { @apply underline decoration-2 underline-offset-2; }
+  :focus-visible { @apply outline outline-[3px] outline-offset-2 outline-accent; }
+}
+
+@layer components {
+  .container-narrow { @apply mx-auto w-full max-w-md px-4; }
+  .card { @apply rounded-card bg-white p-5 shadow-sm ring-1 ring-sand; }
+  .btn { @apply inline-flex min-h-tap w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-lg font-semibold no-underline transition-colors; }
+  .btn-primary { @apply btn bg-accent text-white hover:bg-accent-dark active:bg-accent-dark; }
+  .btn-secondary { @apply btn bg-white text-ink ring-2 ring-sand hover:ring-accent; }
+  .btn-done { @apply btn bg-leaf text-white; }
+  .option { @apply flex min-h-[64px] w-full items-center rounded-card bg-white px-5 py-4 text-left text-lg font-semibold ring-2 ring-sand transition hover:ring-accent; }
+  .option[aria-pressed="true"] { @apply ring-accent bg-accent-soft; }
+  .input { @apply block min-h-tap w-full rounded-xl border-2 border-sand bg-white px-4 py-3 text-lg text-ink placeholder:text-muted focus:border-accent; }
+  .eyebrow { @apply text-sm font-semibold uppercase tracking-wider text-accent-dark; }
+  .tip { @apply rounded-xl bg-accent-soft px-4 py-3 text-base text-ink; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
