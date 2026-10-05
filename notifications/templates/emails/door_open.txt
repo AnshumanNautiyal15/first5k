@@ -1,0 +1,9 @@
+{% autoescape off %}We'll leave the door open.
+
+It's been a little while, and that's okay. We won't keep emailing you.
+Whenever you feel like it, your plan will be here. We'll make the first couple of days gentle so it feels easy to step back in.
+
+Come back anytime: {{ today_url }}
+
+Whatever happens, you started. That counts.
+{% include "emails/_footer.txt" %}{% endautoescape %}

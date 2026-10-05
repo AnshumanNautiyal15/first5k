@@ -1,0 +1,7 @@
+{% autoescape off %}No pressure, your plan is waiting.
+
+Life gets busy, and that's completely okay. Your next 2 days are right where you left them.
+If today's a good day, even a slow, short walk-jog counts. If it isn't, that's fine too.
+
+See your 2 days: {{ today_url }}
+{% include "emails/_footer.txt" %}{% endautoescape %}

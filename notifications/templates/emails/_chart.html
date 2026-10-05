@@ -1,0 +1,17 @@
+{# Bar chart built from table cells: renders in Gmail, Outlook, Apple Mail. Expects: chart #}
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:8px 0 4px;table-layout:fixed;">
+  <tr>
+    {% for b in chart.bars %}
+      <td valign="bottom" align="center" width="{{ chart.col_width }}" style="padding:0 2px;height:{{ chart.height|add:20 }}px;">
+        {% if b.is_latest %}<div style="font-size:12px;font-weight:700;color:#1F2933;line-height:16px;">{{ b.minutes }}</div>{% endif %}
+        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:24px;">
+          <tr><td height="{{ b.height }}" bgcolor="{% if b.is_latest %}#C2410C{% else %}#E08A63{% endif %}" style="height:{{ b.height }}px;line-height:{{ b.height }}px;font-size:1px;border-radius:4px 4px 0 0;background:{% if b.is_latest %}#C2410C{% else %}#E08A63{% endif %};">&nbsp;</td></tr>
+        </table>
+      </td>
+    {% endfor %}
+  </tr>
+  <tr>
+    {% for b in chart.bars %}<td align="center" style="padding-top:4px;font-size:12px;color:#52606D;border-top:1px solid #F1E9DC;">{{ b.number }}</td>{% endfor %}
+  </tr>
+</table>
+<p style="margin:0;font-size:13px;color:#52606D;">Minutes of jogging per run (run number below each bar).</p>

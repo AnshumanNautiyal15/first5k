@@ -1,0 +1,9 @@
+{% extends "emails/base.html" %}
+{% block body %}
+  <p style="margin:0 0 12px;font-size:22px;font-weight:700;">Your next 2 days are ready 👟</p>
+  <p style="margin:0 0 4px;font-weight:700;">Next up: {{ level.title }}</p>
+  <p style="margin:0;">{{ summary }}. {{ level.description }}</p>
+  {% include "emails/_button.html" with url=today_url label="Open my next 2 days" %}
+  <p style="margin:0;color:#52606D;font-size:16px;">No rush. Whenever suits you is the right time.</p>
+{% endblock %}
+{% block footer %}{% include "emails/_footer.html" %}{% endblock %}

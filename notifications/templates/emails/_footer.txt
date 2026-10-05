@@ -1,0 +1,4 @@
+--
+You're getting this because you signed up for {{ SITE_NAME }}.
+Unsubscribe in one click: {{ unsubscribe_url }}
+Not medical advice. Stop if something hurts.

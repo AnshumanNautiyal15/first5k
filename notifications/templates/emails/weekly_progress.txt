@@ -1,0 +1,13 @@
+{% autoescape off %}Your week in running
+
+This week: {{ week.runs }} run{{ week.runs|pluralize }} and {{ week.minutes }} minutes of jogging. Lovely work.
+
+So far: {{ stats.run_count }} runs, {{ stats.total_jog_minutes }} minutes jogged, longest jog {{ stats.longest_jog }} min.
+{% if chart %}
+Minutes of jogging, recent runs:
+{% for b in chart.bars %}Run {{ b.number }}: {{ b.minutes }} min
+{% endfor %}{% endif %}{% if stats.next_milestone %}
+Next milestone: {{ stats.next_milestone.title }}
+{% endif %}
+See your progress: {{ progress_url }}
+{% include "emails/_footer.txt" %}{% endautoescape %}

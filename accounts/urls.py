@@ -10,4 +10,7 @@ urlpatterns = [
     path("auth/verify/<str:token>/", views.verify, name="verify"),
     path("auth/logout/", views.logout_view, name="logout"),
     path("check-email/", views.check_email, name="check_email"),
+    path("account/", views.account, name="account"),
+    path("account/export/", views.export, name="export"),
+    path("account/delete/", views.delete, name="delete"),
 ]

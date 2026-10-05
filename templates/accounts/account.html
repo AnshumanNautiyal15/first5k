@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Account · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<h1 class="pt-4">Your account</h1>
+<p class="mt-2 text-muted [overflow-wrap:anywhere]">Signed in as <strong class="text-ink">{{ user.email }}</strong></p>
+
+<section class="card mt-6" aria-labelledby="settings-heading">
+  <h2 id="settings-heading" class="text-xl">Settings</h2>
+  <form method="post" class="mt-4 space-y-5">
+    {% csrf_token %}
+    <div>
+      <label for="{{ form.timezone.id_for_label }}" class="block font-semibold">Your timezone</label>
+      <p class="text-base text-muted">So unlock times and emails match your day.</p>
+      <div class="mt-2">{{ form.timezone }}</div>
+    </div>
+    <div class="flex items-start gap-3">
+      <input type="checkbox" name="is_subscribed" id="id_is_subscribed" class="mt-1 h-6 w-6 shrink-0 accent-accent" {% if form.is_subscribed.value %}checked{% endif %}>
+      <label for="id_is_subscribed">{{ form.is_subscribed.label }}</label>
+    </div>
+    <button type="submit" class="btn-primary">Save</button>
+  </form>
+</section>
+
+<section class="card mt-6" aria-labelledby="data-heading">
+  <h2 id="data-heading" class="text-xl">Your data</h2>
+  <p class="mt-2 text-muted">Download everything we store about you as a JSON file.</p>
+  <a href="{% url 'accounts:export' %}" class="btn-secondary mt-4">Download my data</a>
+</section>
+
+<section class="card mt-6" aria-labelledby="logout-heading">
+  <h2 id="logout-heading" class="text-xl">Log out</h2>
+  <form method="post" action="{% url 'accounts:logout' %}" class="mt-4">{% csrf_token %}<button type="submit" class="btn-secondary">Log out</button></form>
+</section>
+
+<section class="card mt-6 ring-accent/30" aria-labelledby="delete-heading">
+  <h2 id="delete-heading" class="text-xl">Delete my account</h2>
+  <p class="mt-2 text-muted">This permanently deletes your account, plan, progress and milestones. It can't be undone.</p>
+  <form method="post" action="{% url 'accounts:delete' %}" class="mt-4 space-y-4">
+    {% csrf_token %}
+    <div class="flex items-start gap-3">
+      <input type="checkbox" name="confirm" value="yes" id="confirm-delete" class="mt-1 h-6 w-6 shrink-0 accent-accent" required>
+      <label for="confirm-delete">Yes, delete everything</label>
+    </div>
+    <button type="submit" class="btn bg-white text-accent-dark ring-2 ring-accent">Delete my account</button>
+  </form>
+</section>
+{% endblock %}

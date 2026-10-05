@@ -16,6 +16,7 @@ make test             # pytest (pytest-django, settings in pytest.ini)
 .venv/bin/pytest tests/test_engine.py::test_too_hard_twice_goes_down_one   # single test
 make css              # build static/css/app.css with the Tailwind v3 standalone CLI in bin/ (auto-downloaded)
 make css-watch
+.venv/bin/python manage.py send_scheduled_emails   # hourly via cron in production
 ```
 
 After changing Tailwind classes in templates or JS, run `make css` and commit `static/css/app.css`; production never runs the CLI.
@@ -32,6 +33,7 @@ After changing Tailwind classes in templates or JS, run `make css` and commit `s
 - Auth (`accounts/magic_link.py`): only the SHA-256 of a token is stored; users are created on first *verified* login, not when the email is entered. `/auth/verify/<token>/` GET only shows a confirm button and POST redeems it, because mail scanners prefetch links. Onboarding answers are copied onto the token so opening the link in a different browser still works.
 - Interactive endpoints (e.g. `plans:complete_day`) return JSON when the request sends `Accept: application/json` (see `static/js/api.js`), otherwise they redirect with a flash message (the no-JS fallback).
 - Never name a template context variable `block`: Django reserves it inside `{% block %}` tags. Views pass the current block as `current`.
+- Emails: `notifications/email.send_to_user` claims an `EmailLog` row (unique per user/kind/ref) *before* sending and deletes it if sending fails. That is what makes the hourly `send_scheduled_emails` command idempotent. Which email is due is decided in `notifications/scheduler.py` (local 08–20 window, 20h minimum spacing, "door's open" makes a user dormant until their next activity). Email charts are HTML table cells, never SVG or JS. Magic-link emails are transactional: never logged and sent even to unsubscribed users.
 - `tests/conftest.py` forces non-manifest static storage, no SSL redirect and the locmem email backend, so tests pass whatever `DEBUG` is.
 
 ## Conventions

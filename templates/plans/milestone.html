@@ -9,7 +9,16 @@
   <p class="mt-4 text-xl">{{ message }}</p>
   <p class="mt-2 text-base text-muted">{{ milestone.achieved_at|date:"j F Y" }}</p>
 </section>
-{# Share card slot: added in Phase 4. #}
+<section class="card mt-8" aria-labelledby="share-heading" data-share-card hidden
+  data-key="{{ milestone.key }}" data-emoji="{{ info.emoji }}" data-text="{{ info.share_text }}"
+  data-date="{{ milestone.achieved_at|date:'j F Y' }}" data-site="{{ site_host }}">
+  <h2 id="share-heading" class="text-xl">Share your moment</h2>
+  <canvas class="mt-4 aspect-square w-full rounded-xl ring-1 ring-sand" role="img" aria-label="Share card: {{ info.share_text }}"></canvas>
+  <div class="mt-4 grid gap-3">
+    <button type="button" class="btn-secondary" data-share hidden><span aria-hidden="true">📤</span> Share</button>
+    <button type="button" class="btn-secondary" data-download><span aria-hidden="true">⬇️</span> Download image</button>
+  </div>
+</section>
 <div class="mt-8 space-y-3">
   <a href="{{ next_url }}" class="btn-primary">Keep going</a>
   <a href="{% url 'plans:progress' %}" class="btn-secondary">See my progress</a>
@@ -20,4 +29,5 @@
   import { confetti } from "{% static 'js/confetti.js' %}";
   confetti({ pieces: 160, duration: 3200 });
 </script>
+<script type="module" src="{% static 'js/share-card.js' %}"></script>
 {% endblock %}

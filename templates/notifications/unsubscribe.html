@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Email preferences · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="pt-8 text-center">
+  {% if invalid %}
+    <h1>That link doesn't work</h1>
+    <p class="mt-3 text-muted">It may be incomplete. You can always change email settings from your account page.</p>
+    <a href="{% url 'accounts:account' %}" class="btn-secondary mt-6">Go to my account</a>
+  {% elif done %}
+    <p class="text-6xl" aria-hidden="true">👋</p>
+    <h1 class="mt-4">You're unsubscribed</h1>
+    <p class="mt-3 text-muted">No more plan emails. Your plan is still here whenever you want it, and you can turn emails back on from your account page.</p>
+    <a href="{% url 'plans:today' %}" class="btn-secondary mt-6">Open my plan</a>
+  {% else %}
+    <h1>Stop plan emails?</h1>
+    <p class="mt-3 text-muted">We'll stop emailing <strong class="[overflow-wrap:anywhere]">{{ email }}</strong> about new blocks and progress. Login links will still work.</p>
+    <form method="post" class="mt-6"><button type="submit" class="btn-primary">Unsubscribe</button></form>
+    <a href="{% url 'plans:today' %}" class="btn-secondary mt-3">Keep my emails</a>
+  {% endif %}
+</div>
+{% endblock %}

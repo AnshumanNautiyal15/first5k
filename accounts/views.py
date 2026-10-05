@@ -1,11 +1,19 @@
+import json
+import zoneinfo
+
 from django import forms
+from django.contrib import messages as flash
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_POST
 
-from notifications.email import send_magic_link
+from notifications.email import send_magic_link, send_welcome
 from plans import onboarding, services
 
+from . import account as account_service
 from . import magic_link
 
 GENERIC_SENT = "If that email is valid, a link is on its way. It works for 15 minutes."
@@ -105,13 +113,60 @@ def verify(request, token):
     if not hasattr(user, "journey"):
         if not onboarding.is_complete(answers):
             return redirect("plans:start")
-        services.create_journey(user, answers["activity"], answers["jog_ability"], answers.get("start_id"),
-                                age_group=answers.get("age_group", ""))
+        journey = services.create_journey(user, answers["activity"], answers["jog_ability"], answers.get("start_id"),
+                                          age_group=answers.get("age_group", ""))
         request.session.pop(onboarding.SESSION_KEY, None)
+        send_welcome(journey)
     return redirect("plans:today")
 
 
 @require_POST
 def logout_view(request):
     logout(request)
+    return redirect("core:landing")
+
+
+# --- Account page ----------------------------------------------------------------------
+
+TIMEZONES = sorted(zoneinfo.available_timezones() - {"localtime", "Factory"})
+
+
+class SettingsForm(forms.Form):
+    timezone = forms.ChoiceField(choices=[(tz, tz.replace("_", " ")) for tz in TIMEZONES],
+                                 widget=forms.Select(attrs={"class": "input"}))
+    is_subscribed = forms.BooleanField(required=False, label="Email me when my next 2 days are ready, plus a weekly progress update")
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def account(request):
+    user = request.user
+    form = SettingsForm(request.POST or None, initial={"timezone": user.timezone, "is_subscribed": user.is_subscribed})
+    if request.method == "POST" and form.is_valid():
+        user.timezone = form.cleaned_data["timezone"]
+        user.is_subscribed = form.cleaned_data["is_subscribed"]
+        user.save(update_fields=["timezone", "is_subscribed"])
+        flash.success(request, "Saved. All set!")
+        return redirect("accounts:account")
+    return render(request, "accounts/account.html", {"form": form})
+
+
+@login_required
+def export(request):
+    data = account_service.export_data(request.user)
+    resp = HttpResponse(json.dumps(data, indent=2), content_type="application/json")
+    resp["Content-Disposition"] = f'attachment; filename="first5k-data-{timezone.now():%Y%m%d}.json"'
+    return resp
+
+
+@login_required
+@require_POST
+def delete(request):
+    if request.POST.get("confirm") != "yes":
+        flash.info(request, "Tick the box to confirm, so nothing gets deleted by accident.")
+        return redirect("accounts:account")
+    user = request.user
+    logout(request)
+    account_service.delete_account(user)
+    flash.success(request, "Your account and all your data are deleted. Thanks for running with us. Take care! 💛")
     return redirect("core:landing")

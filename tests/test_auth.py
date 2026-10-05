@@ -19,6 +19,12 @@ def link_from_mail(message) -> str:
     return re.search(r"https?://\S+/auth/verify/[\w-]+/", message.body).group(0)
 
 
+def latest_link() -> str:
+    """Path of the most recent magic link sent."""
+    msg = [m for m in mail.outbox if "/auth/verify/" in m.body][-1]
+    return path_of(link_from_mail(msg))
+
+
 def path_of(url: str) -> str:
     return re.sub(r"^https?://[^/]+", "", url)
 
@@ -177,7 +183,7 @@ def test_returning_user_login_keeps_existing_journey(client):
     client.post(reverse("accounts:logout"))
 
     client.post(reverse("accounts:login"), {"email": "x@example.com"})
-    client.post(path_of(link_from_mail(mail.outbox[1])))
+    client.post(latest_link())
     assert Journey.objects.count() == 1
     assert client.get(reverse("plans:today")).status_code == 200
 

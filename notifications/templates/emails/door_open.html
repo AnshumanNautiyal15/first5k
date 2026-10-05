@@ -1,0 +1,9 @@
+{% extends "emails/base.html" %}
+{% block body %}
+  <p style="margin:0 0 12px;font-size:22px;font-weight:700;">We'll leave the door open.</p>
+  <p style="margin:0 0 12px;">It's been a little while, and that's okay. We won't keep emailing you.</p>
+  <p style="margin:0;">Whenever you feel like it, your plan will be here. We'll make the first couple of days gentle so it feels easy to step back in.</p>
+  {% include "emails/_button.html" with url=today_url label="Come back anytime" %}
+  <p style="margin:0;color:#52606D;font-size:16px;">Whatever happens, you started. That counts.</p>
+{% endblock %}
+{% block footer %}{% include "emails/_footer.html" %}{% endblock %}

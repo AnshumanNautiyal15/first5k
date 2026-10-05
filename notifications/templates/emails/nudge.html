@@ -1,0 +1,8 @@
+{% extends "emails/base.html" %}
+{% block body %}
+  <p style="margin:0 0 12px;font-size:22px;font-weight:700;">No pressure, your plan is waiting.</p>
+  <p style="margin:0 0 12px;">Life gets busy, and that's completely okay. Your next 2 days are right where you left them.</p>
+  <p style="margin:0;">If today's a good day, even a slow, short walk-jog counts. If it isn't, that's fine too.</p>
+  {% include "emails/_button.html" with url=today_url label="See my 2 days" %}
+{% endblock %}
+{% block footer %}{% include "emails/_footer.html" %}{% endblock %}

@@ -98,6 +98,8 @@ def _get_or_create_journey(request) -> Journey | None:
     journey = services.create_journey(request.user, answers["activity"], answers["jog_ability"], answers.get("start_id"),
                                       age_group=answers.get("age_group", ""))
     request.session.pop(onboarding.SESSION_KEY, None)
+    from notifications.email import send_welcome
+    send_welcome(journey)
     return journey
 
 
@@ -220,6 +222,7 @@ def milestone(request, key):
         "milestone": m,
         "info": m.info,
         "message": msgs.pick(f"milestone_{key}").text,
+        "site_host": settings.SITE_URL.split("://", 1)[-1],
         "next_url": _milestone_url(journey) or reverse("plans:finished" if journey.is_complete else "plans:today"),
     })
 

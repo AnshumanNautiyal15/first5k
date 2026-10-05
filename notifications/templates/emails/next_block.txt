@@ -1,0 +1,9 @@
+{% autoescape off %}Your next 2 days are ready!
+
+Next up: {{ level.title }}
+{{ summary }}. {{ level.description }}
+
+Open your next 2 days: {{ today_url }}
+
+No rush. Whenever suits you is the right time.
+{% include "emails/_footer.txt" %}{% endautoescape %}

@@ -1,0 +1,11 @@
+{% autoescape off %}You just did the hardest part: deciding to start.
+
+Welcome to {{ SITE_NAME }}! You'll only ever see your next 2 days. Do them, tell us how they felt, and we'll shape the next 2 around you.
+
+Your first run: {{ level.title }}
+{{ summary }}, with a 5-minute walk before and after. Slow is fine, and walking is always allowed.
+
+See your first 2 days: {{ today_url }}
+
+We'll email you when your next 2 days are ready. That's it, no spam.
+{% include "emails/_footer.txt" %}{% endautoescape %}

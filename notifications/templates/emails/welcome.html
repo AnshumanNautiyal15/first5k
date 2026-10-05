@@ -1,0 +1,10 @@
+{% extends "emails/base.html" %}
+{% block body %}
+  <p style="margin:0 0 12px;font-size:22px;font-weight:700;">You just did the hardest part: deciding to start.</p>
+  <p style="margin:0 0 12px;">Welcome to {{ SITE_NAME }}! Here's how it works: you'll only ever see your next 2 days. Do them, tell us how they felt, and we'll shape the next 2 around you.</p>
+  <p style="margin:0 0 4px;font-weight:700;">Your first run: {{ level.title }}</p>
+  <p style="margin:0;">{{ summary }}, with a 5-minute walk before and after. Slow is fine, and walking is always allowed.</p>
+  {% include "emails/_button.html" with url=today_url label="See my first 2 days" %}
+  <p style="margin:0;color:#52606D;font-size:16px;">We'll email you when your next 2 days are ready. That's it, no spam.</p>
+{% endblock %}
+{% block footer %}{% include "emails/_footer.html" %}{% endblock %}
